@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>欢迎使用 OpenResty!</title>
+<style>
+    body {
+        width: 55em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+	table {
+		font-family: verdana,arial,sans-serif;
+		font-size:11px;
+		color:#333333;
+		border-width: 1px;
+		border-color: #666666;
+		border-collapse: collapse;
+		margin-left: 2em;
+	}
+	table th {
+		border-width: 1px;
+		padding: 8px;
+		border-style: solid;
+		border-color: #666666;
+		background-color: #dedede;
+		text-align:left;
+	}
+	table td {
+		border-width: 1px;
+		padding: 8px;
+		border-style: solid;
+		border-color: #666666;
+		background-color: #ffffff;
+		text-align:left;
+	}
+</style>
+</head>
+<body>
+
+<h2>欢迎使用 OpenResty
+	<a target="_blank" href="/info"    style="margin-left:20px;"> ! </a>
+	<a target="_blank" href="/status"  style="margin-left:10px;"> # </a>
+	<a target="_blank" href="/monitor" style="margin-left:10px;"> @@ </a>
+</h2>
+
+
+<p><a target="_blank" href="https://openresty.org/cn/">OpenResty</a> 由国人 章亦春 <a target="_blank" href="https://weibo.com/agentzh">@agentzh</a> 主力开发的一个基于 <a target="_blank" href="https://nginx.org/">Nginx</a> 与 <a target="_blank" href="https://www.lua.org/">Lua</a> 的高性能 Web 平台，其内部集成了大量精良的 Lua 库、第三方模块以及大多数的依赖项。用于方便地搭建能够处理超高并发、扩展性极高的动态 Web 应用、Web 服务和动态网关。</p>
+
+<p>
+由于官方打包的 Windows 版本最多1024连接数限制，可以使用第三方打包的 <a target="_blank" href="http://nginx-win.ecsds.eu/">NGINX for Windows</a> 作为前端服务器；
+<br>在 <a target="_blank" href="https://luaforge.net/projects/">luaforge.net</a> 上有大量第三方 lua库，
+部分lua库需要编译源码，windows下比较麻烦，可以通过安装 <a target="_blank" href="http://luaforge.net/projects/luaforwindows/">luaforwindows</a> 获取已编译好的组件</a>，
+也可以到 <a target="_blank" href="https://luapower.com/">luapower.com</a> 找找看。
+( <a target="_blank" href="https://luapower.com/lfs/download">下载lfs库</a> )
+</p>
+
+<h3>入门教程</h3>
+<ul>
+	<li>
+		<a target="_blank" href="http://v.163.com/paike/V8H1BIE6U/V949ER8RD.html">章亦春在网易的演讲视频</a> |
+		<a target="_blank" href="http://www.oschina.net/translate/nginx-setup">Nginx优化指南</a>
+	</li>
+	<li>
+		<a target="_blank" href="/_doc/openresty/nginx.html">agentzh的Nginx教程</a> |
+		<a target="_blank" href="/_doc/nginx/index.html">Nginx中文文档</a> |
+		<a target="_blank" href="/_doc/openresty/nginx-lua.html">nginx-lua中文文档</a> |
+		<a target="_blank" href="http://tengine.taobao.org/book/index.html">Nginx开发从入门到精通</a> |
+		<a target="_blank" href="https://segmentfault.com/a/1190000004457479">HTTP协议详解</a>
+	</li>
+	<li>执行顺序和阶段的示意图：
+		<a target="_blank" href="/_doc/openresty/openresty.png">ngx_lua执行阶段</a> |
+		<a target="_blank" href="/_doc/openresty/nginxstep.png">Nginx执行阶段</a> |
+		<a target="_blank" href="https://moonbingbing.gitbooks.io/openresty-best-practices/content/ngx_lua/phase.html">执行阶段概念</a>
+	</li>
+	<li>由 温铭 等提供的入门教程：
+		<a target="_blank" href="https://moonbingbing.gitbooks.io/openresty-best-practices/content/index.html">OpenResty 最佳实践</a>
+		<a target="_blank" href="http://www.stuq.org/my/courses/study/1015">OpenResty 视频教程</a>
+		<a target="_blank" href="http://chuansong.me/n/1858478">微课堂整理</a>
+	</li>
+	<li>其它教程：
+		<a target="_blank" href="http://jinnianshilongnian.iteye.com/blog/2190344">跟我学Nginx+Lua开发目录贴 - 开涛的博客</a> |
+		<a target="_blank" href="http://www.jellythink.com/archives/882">Lua入门系列 - 果冻想</a>
+	</li>
+	<li>lua 语言教程：
+		<a target="_blank" href="http://www.cnblogs.com/ly4cn/archive/2006/08/04/467550.html">Lua脚本语法说明</a> |
+		<a target="_blank" href="http://www.runoob.com/lua/lua-tutorial.html">Lua 脚本语言中文教程</a> |
+		<a target="_blank" href="http://lua-users.org/wiki/LuaDirectory">Lua-Users Wiki</a>
+	</li>
+	<li>正则表达式教程：
+		<a target="_blank" href="http://weibo.com/deerchao">@deerchao</a> 提供的
+		<a target="_blank" href="/_doc/regx/regex.html">正则表达式30分钟入门教程</a> |
+		<a target="_blank" href="/_doc/regx/common.html">常用正则表达式</a> |
+		<a target="_blank" href="/_doc/regx/regexsc.html">正则表达式速查表</a>
+	</li>
+	<li>后端相关：
+		<a target="_blank" href="/_doc/redis/index.html">Redis 命令参考手册</a> |
+		<a target="_blank" href="http://www.runoob.com/redis/redis-tutorial.html">Redis 教程</a> |
+		<a target="_blank" href="http://www.runoob.com/sql/sql-tutorial.html">SQL 教程</a> |
+		<a target="_blank" href="http://www.runoob.com/mysql/mysql-tutorial.html">MySQL 教程</a> |
+		<a target="_blank" href="http://ssdb.io/zh_cn/">SSDB</a>
+	</li>
+	<li>前端相关：
+		<a target="_blank" href="http://www.runoob.com/html/html-tutorial.html">HTML5 教程</a> |
+		<a target="_blank" href="http://www.runoob.com/js/js-tutorial.html">JavaScript 教程</a> |
+		<a target="_blank" href="http://www.runoob.com/css/css-tutorial.html">CSS 教程</a> |
+		<a target="_blank" href="http://www.runoob.com/jquery/jquery-tutorial.html">jQuery 教程</a> |
+		<a target="_blank" href="http://www.requirejs.cn/docs/api.html">RequireJS 文档</a> |
+		<a target="_blank" href="http://www.runoob.com/bootstrap/bootstrap-tutorial.html">Bootstrap 教程</a>
+	</li>
+	<li>运维相关：
+		<a target="_blank" href="http://www.runoob.com/linux/linux-tutorial.html">Linux 教程</a> |
+		<a target="_blank" href="http://wangzhan.360.cn/xingtu/">360星图 - Web日志分析系统</a> |
+		<a target="_blank" href="http://www.zabbix.com/">zabbix - 系统监控系统</a>
+	</li>
+	<li>常用工具：
+		<a target="_blank" href="https://babun.github.io/">Babun官网</a>
+		(<a target="_blank" href="http://ju.outofmemory.cn/entry/257660">配置</a>) | pip | Icdiff |
+		<a target="_blank" href="https://github.com/jkbrzt/httpie">httpie</a>
+		(<a target="_blank" href="http://top.jobbole.com/9682/">中文介绍</a>) |
+		<a target="_blank" href="http://www.cnblogs.com/zengxiangzhan/archive/2012/12/07/2807141.html">ab 压力测试</a> |
+		<a target="_blank" href="http://www.cnblogs.com/wangkangluo1/archive/2012/04/17/2453975.html">curl 命令</a> |
+		<a target="_blank" href="http://www.cnblogs.com/wangkangluo1/archive/2012/04/17/2453946.html">wget 命令</a> |
+		<a target="_blank" href="https://www.cnblogs.com/terencezhou/p/10474617.html">JsonSchema</a>
+	</li>
+</ul>
+
+<h3>lua-resty 常用库</h3>
+
+<table id="libs">
+	<tr>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/openresty/lua-resty-core">core</a></td>
+		<td><a target="_blank" href="https://github.com/openresty/lua-resty-core/releases">v0.1.21</a></td>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/bungle/lua-resty-template">template</a></td>
+		<td><a target="_blank" href="https://github.com/bungle/lua-resty-template/releases">v2.0</a></td>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/openresty/lua-cjson">cjson</a></td>
+		<td><a target="_blank" href="https://github.com/openresty/lua-cjson/releases">v2.1.0.8</a></td>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/bungle/lua-resty-prettycjson">prettycjson</a></td>
+		<td><a target="_blank" href="https://github.com/bungle/lua-resty-prettycjson/releases">v1.6</a></td>
+	</tr>
+	<tr>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/openresty/lua-resty-mysql">mysql</a></td>
+		<td><a target="_blank" href="https://github.com/openresty/lua-resty-mysql/releases">v0.23</a></td>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/openresty/lua-resty-memcached">memcached</a></td>
+		<td><a target="_blank" href="https://github.com/openresty/lua-resty-memcached/releases">v0.15</a></td>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/openresty/lua-resty-redis">redis</a></td>
+		<td><a target="_blank" href="https://github.com/openresty/lua-resty-redis/releases">v0.28</a></td>
+	</tr>
+	<tr>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/openresty/lua-resty-lock">lock</a></td>
+		<td><a target="_blank" href="https://github.com/openresty/lua-resty-lock/releases">v0.08</a></td>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/openresty/lua-resty-lrucache">lrucache</a></td>
+		<td><a target="_blank" href="https://github.com/openresty/lua-resty-lrucache/releases">v0.10</a></td>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/thibaultcha/lua-resty-mlcache">mlcache</a></td>
+		<td><a target="_blank" href="https://github.com/thibaultcha/lua-resty-mlcache/releases">v2.5.0</a></td>
+	</tr>
+	<tr>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/openresty/lua-resty-string">string</a></td>
+		<td><a target="_blank" href="https://github.com/openresty/lua-resty-string/releases">v0.12</a></td>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/doujiang24/lua-resty-rsa">rsa</a></td>
+		<td><a target="_blank" href="https://github.com/doujiang24/lua-resty-rsa/releases">v1.0.2</a></td>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/thibaultcha/lua-resty-jit-uuid">jit-uuid</a></td>
+		<td><a target="_blank" href="https://github.com/thibaultcha/lua-resty-jit-uuid/releases">v0.0.7</a></td>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/bungle/lua-resty-random">random</a></td>
+	</tr>
+	<tr>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/pintsized/lua-resty-http">http</a></td>
+		<td><a target="_blank" href="https://github.com/pintsized/lua-resty-http/releases">v0.16.1</a></td>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/openresty/lua-resty-dns">dns</a></td>
+		<td><a target="_blank" href="https://github.com/openresty/lua-resty-dns/releases">v0.21</a></td>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/openresty/lua-resty-upload">upload</a></td>
+		<td><a target="_blank" href="https://github.com/openresty/lua-resty-upload/releases">v0.10</a></td>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/hamishforbes/lua-resty-iputils">iputils</a></td>
+		<td><a target="_blank" href="https://github.com/hamishforbes/lua-resty-iputils/releases">v0.3.0</a></td>
+	</tr>
+	<tr>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/cloudflare/lua-resty-cookie">cookie</a></td>
+		<td><a target="_blank" href="https://github.com/cloudflare/lua-resty-cookie/releases">v0.1.0</a></td>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/bungle/lua-resty-session">session</a></td>
+		<td><a target="_blank" href="https://github.com/bungle/lua-resty-session/releases">v2.24</a></td>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/openresty/lua-resty-websocket">websocket</a></td>
+		<td><a target="_blank" href="https://github.com/openresty/lua-resty-websocket/releases">v0.08</a></td>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/openresty/lua-resty-limit-traffic">limit-traffic</a></td>
+		<td><a target="_blank" href="https://github.com/openresty/lua-resty-limit-traffic/releases">v0.07</a></td>
+	</tr>
+	<tr>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/keplerproject/luafilesystem">lfs</a></td>
+		<td><a target="_blank" href="https://github.com/keplerproject/luafilesystem/releases">v1.8.0</a></td>
+
+		<th></th>
+		<td><a target="_blank" href="https://github.com/sonoro1234/luafilesystem">lfs_ffi</a></td>
+		<td>v0.1</td>
+
+		<th></th>
+		<td><a target="_blank" href="https://github.com/spacewander/luafilesystem">lfs_ffi</a> (linux)</td>
+		<td>v0.3.0</td>
+
+	</tr>
+	<tr>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/starwing/luautf8">luautf8</a></td>
+		<td><a target="_blank" href="https://github.com/starwing/luautf8/releases">v0.1.3</a></td>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/diegonehab/luasocket">luasocket</a></td>
+		<td><a target="_blank" href="https://github.com/diegonehab/luasocket/releases">v3.0-rc1</a></td>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/leihog/hashids.lua">hashids</a></td>
+		<td><a target="_blank" href="https://github.com/leihog/hashids.lua/releases">v1.0.6</a></td>
+	</tr>
+	<tr>
+		<th></th>
+		<td><a target="_blank" href="https://luapower.com/zlib">zlib</a></td>
+		<td><a target="_blank" href="https://luapower.com/zlib/download">v1.2.7</a></td>
+		<th></th>
+		<td><a target="_blank" href="http://scilua.org/time.html">time</a></td>
+		<td><a target="_blank" href="https://github.com/stepelu/lua-time/releases">v1.1.0</a></td>
+		<th></th>
+		<td><a target="_blank" href="https://github.com/ipipdotnet/ipdb-luajit">ipdb</a></td>
+		<td><a target="_blank" href="http://www.ipip.net/download.html">IP库</a></td>
+		<td colspan="3">试用版 (20190703)</td>
+	</tr>
+</table>
+
+<script>
+	var $libs = document.getElementById("libs");
+	var $ths = $libs.getElementsByTagName("th");
+
+	for (i=0; i<$ths.length; i++) {
+		var $th = $ths[i];
+		var text = (i+1) >= 10 && (i+1) || "0" + (i+1);
+		$th.innerText = text;
+	}
+
+</script>
+
+<h3>其它链接</h3>
+<ul>
+	<li><a target="_blank" href="http://wdicc.com/intro-openresty/">介绍下 openresty</a></li>
+	<li><a target="_blank" href="http://www.nginx.cn/76.html">nginx 基本配置与参数说明</a></li>
+	<li>IResty论坛：
+		<a target="_blank" href="http://www.iresty.com/">OpenResty Con 2015</a> |
+		<a target="_blank" href="http://i.youku.com/i/UMjczNDA2MTYw">现场演讲视频</a>
+	</li>
+	<li>SSDB：
+		<a target="_blank" href="http://www.ideawu.net/blog/">idea's blog</a> (SSDB作者博客) |
+		<a target="_blank" href="http://www.udpwork.com/">IT牛人博客聚合</a>
+	</li>
+	<li>高可用性：
+		<a target="_blank" href="http://www.udpwork.com/item/15755.html">关于高可用的系统</a> |
+	</li>
+	<li>CAP理论：
+		<a target="_blank" href="http://www.cnblogs.com/fxjwind/archive/2012/02/24/2367031.html">CAP解释</a> |
+		<a target="_blank" href="http://blog.csdn.net/chen77716/article/details/30635543">CAP理论</a> |
+		<a target="_blank" href="http://www.infoq.com/cn/articles/cap-twelve-years-later-how-the-rules-have-changed">CAP理论十二年回顾："规则"变了</a>
+	</li>
+	<li>
+		<a target="_blank" href="http://fex.baidu.com/blog/2015/01/chrome-stalled-problem-resolving-process/">关于请求被挂起页面加载缓慢问题的追查</a> |
+		<a target="_blank" href="http://www.cnblogs.com/ElEGenT/p/5549267.html">nginx ： server_name localhost</a>
+	</li>
+
+</ul>
+
+
+</body>
+</html>

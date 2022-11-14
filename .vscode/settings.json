@@ -1,0 +1,32 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/tmp": true,
+    },
+
+    "workbench.tree.indent": 22,
+
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
+
+    "editor.rulers": [ 100, 120 ],
+    "editor.formatOnSave": false,
+    "editor.formatOnPaste": false,
+    "editor.mouseWheelZoom": true,
+    "editor.showFoldingControls": "always",
+    "editor.tabSize": 4,
+    "editor.trimAutoWhitespace": false,
+    "editor.useTabStops": true,
+    "editor.multiCursorModifier": "ctrlCmd",
+    "editor.snippetSuggestions": "top",
+
+    "editor.quickSuggestions": {
+        "other": "on",
+        "comments": "off",
+        "strings": "on"
+    }
+}

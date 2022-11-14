@@ -1,0 +1,26 @@
+{
+    "version":  "0.0.1",
+    "license":  "MIT",
+    "homepage":  "https://github.com/killsen/openresty-orpm",
+    "app_name":  "demo",
+    "openresty_ver":  "1.21.4.1",
+    "luarocks_ver":  "3.9.1",
+    "mingw_ver":  "12.2.0",
+    "arch":  "64bit",
+    "libs":  {
+                 "killsen/openresty-appx":  "master",
+                 "killsen/openresty-lua-types":  "master",
+                 "killsen/openresty-clib":  "master",
+                 "bungle/lua-resty-prettycjson":  "v1.6",
+                 "bungle/lua-resty-template":  "v2.0",
+                 "thibaultcha/lua-resty-mlcache":  "2.6.0",
+                 "hamishforbes/lua-resty-iputils":  "v0.3.0",
+                 "ledgetech/lua-resty-http":  "v0.16.1",
+                 "agentzh/lua-resty-multipart-parser":  "master",
+                 "golgote/lua-resty-info":  "master",
+                 "bungle/lua-resty-random":  "master",
+                 "fffonion/lua-resty-acme":  "0.9.0",
+                 "fffonion/lua-resty-openssl":  "0.8.15",
+                 "guosiu/lua-resty-date":  "v2.2"
+             }
+}
