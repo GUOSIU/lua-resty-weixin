@@ -121,7 +121,7 @@ __.delete__ = {
         { "errmsg"  , "错误信息，ok为正确"          }
     }
 }
-__.delete = function(t)
+__.delete = function()
     return wx.http.send {
         url     = "https://api.weixin.qq.com/cgi-bin/menu/delete",
         token   = true,
