@@ -2,8 +2,9 @@
 local _decode       = require "cjson.safe".decode
 local _encode       = require "cjson.safe".encode
 local _args         = ngx.encode_args
+local _gsub         = string.gsub
 
-local utils         = require "resty.utils"
+local utils         = require "app.utils"
 local WX_ERROR_CODE = require "resty.weixin.error_code" -- 微信错误编码
 
 local USE_PROXY     = {} -- 使用代理服务器
@@ -39,12 +40,12 @@ __.send__ = {
     req = {
         { "url"     , "请求路径"                    },
 
-        { "appid"   , "第三方用户唯一凭证"          },
+        { "appid?"  , "第三方用户唯一凭证"          },
         { "secret?" , "第三方用户唯一凭证密钥"      },
         { "token?"  , "是否需要token"   , "boolean" },
 
         { "args?"   , "请求args"        , "object"  },
-        { "body?"   , "请求body"        , "string"  },
+        { "body?"   , "请求body"        , "any"     },
         { "xml?"    , "返回xml字符串"   , "boolean" },
         { "bin?"    , "返回二进制数据"  , "boolean" },
         { "reload?" , "重新获取token"   , "boolean" },
@@ -53,7 +54,12 @@ __.send__ = {
 }
 __.send = function(t)
 
-    t.secret = utils.strip(t.secret)
+    local weixin = ngx.ctx.weixin or {}
+
+    t.appid  = utils.str.strip(t.appid ) or weixin.appid
+    t.secret = utils.str.strip(t.secret) or weixin.secret
+
+    if not t.appid then return nil, "appid不能为空" end
 
     -- 获取 access_token
     if t.token then
@@ -68,15 +74,15 @@ __.send = function(t)
 
     -- 是否使用代理服务器
     if USE_PROXY[app_url] then
-        t.url = utils.str.gsub(t.url,
+        t.url = _gsub(t.url,
                "https://api.weixin.qq.com/",
                "http://ngx.weimember.cn/weixin_api/")
     end
 
-    local body, boundary = get_img_body(t)
+    local  body, boundary = get_img_body(t)
     if not body and type(t.body) == "table" then t.body = _encode(t.body) end
 
-    local res, err = utils.net.request(t.url, {
+    local res, err = utils.request(t.url, {
             ssl_verify  = false -- 不校验证书
         ,   method      = (body or t.body) and "POST" or "GET"
         ,   body        = (body or t.body)
@@ -87,6 +93,7 @@ __.send = function(t)
                 or  "application/x-www-form-urlencoded; charset=utf-8"
         }
     })
+
     if err then return nil, err end
 
     if res.status ~= ngx.HTTP_OK then
@@ -151,9 +158,9 @@ __.get_access_token = function(t)
 
     local key = t.appid .. "/token"
 
-    if t.reload then utils.cache.del(key) end
+    if t.reload then utils.mlcache.del(key) end
 
-    return utils.cache.load ( key, function()
+    return utils.mlcache.load ( key, function()
 
         local res, err = __.send {
                 url     = "https://api.weixin.qq.com/cgi-bin/token"

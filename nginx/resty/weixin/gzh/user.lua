@@ -1,7 +1,27 @@
 
-local http_send = require "resty.weixin.http".send
+local wx = require "resty.weixin"
 
 local __ = { _VERSION = "22.11.04" }
+
+__._TESTING = function()
+
+    wx.test.run {
+        name    = " ------------ 获取用户基本信息 ------------ ",
+        fun     = __.info,
+        param   = { openid = "oVs8y6bohaCm8I0XmuGuLbhzr_IU" }
+    }
+
+    wx.test.run {
+        name    = " ------------ 批量获取用户基本信息 ------------ ",
+        fun     = __.batchget,
+        param   = {
+            user_list = {
+                { openid = "oVs8y6bohaCm8I0XmuGuLbhzr_IU" }
+            }
+        }
+    }
+
+end
 
 __.types = {
     User = {
@@ -27,13 +47,14 @@ __.info__ = {
     doc = "https://developers.weixin.qq.com/doc/offiaccount/User_Management/Get_users_basic_information_UnionID.html#UinonId",
     req = {
         "@User",
-        { "appid"   , "第三方用户唯一凭证"      },
-        { "secret"  , "第三方用户唯一凭证密钥"  },
+        { "appid?"  , "第三方用户唯一凭证"      },
+        { "secret?" , "第三方用户唯一凭证密钥"  },
     },
     res = "@UserInfo"
 }
 __.info = function(t)
-    return http_send {
+
+    return wx.http.send {
         url     = "https://api.weixin.qq.com/cgi-bin/user/info",
         token   = true,
         appid   = t.appid,
@@ -46,8 +67,8 @@ __.batchget__ = {
     "批量获取用户基本信息",
     doc = "https://developers.weixin.qq.com/doc/offiaccount/User_Management/Get_users_basic_information_UnionID.html#UinonId",
     req = {
-        { "appid"       , "第三方用户唯一凭证"      },
-        { "secret"      , "第三方用户唯一凭证密钥"  },
+        { "appid?"      , "第三方用户唯一凭证"      },
+        { "secret?"     , "第三方用户唯一凭证密钥"  },
         { "user_list"   , "openid列表"  , "@User[]" },
     },
     res = { "user_info_list", "用户信息列表", "@UserInfo[]"}
@@ -58,7 +79,7 @@ __.batchget = function(t)
         return nil, "openid列表不能为空"
     end
 
-    return http_send {
+    return wx.http.send {
         url     = "https://api.weixin.qq.com/cgi-bin/user/info/batchget",
         token   = true,
         appid   = t.appid,
