@@ -5,19 +5,22 @@ local __ = { _VERSION = "22.11.04" }
 
 __._TESTING = function()
 
+    package.loaded["resty.weixin"] = nil
+    wx = require "resty.weixin"
+
     wx.init()
 
-    local res, err = __.info { openid = "oVs8y6bohaCm8I0XmuGuLbhzr_IU" }
+    local res, err = wx.gzh.user.info { openid = "oVs8y6bohaCm8I0XmuGuLbhzr_IU" }
     wx.test.echo ( "-- 获取用户基本信息", res or err)
 
-    local res, err = __.batchget {
+    local res, err = wx.gzh.user.batchget {
         user_list = {
             { openid = "oVs8y6bohaCm8I0XmuGuLbhzr_IU" }
         }
     }
     wx.test.echo ( "-- 批量获取用户基本信息", res or err)
 
-    local res, err = __.get()
+    local res, err = wx.gzh.user.get()
     wx.test.echo ( "-- 用户管理/获取用户列表", res or err)
 
 end
@@ -95,7 +98,7 @@ __.get = function(t)
     return wx.http.send {
         url     = "https://api.weixin.qq.com/cgi-bin/user/get",
         token   = true,
-        args    = { next_openid = t and t.next_openid }
+        args    = { next_openid = t.next_openid }
     }
 end
 

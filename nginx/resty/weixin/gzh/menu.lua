@@ -5,12 +5,15 @@ local __ = { _VERSION = "22.11.01" }
 
 __._TESTING = function()
 
+    package.loaded["resty.weixin"] = nil
+    wx = require "resty.weixin"
+
     wx.init()
 
-    local res, err = __.get()
+    local res, err = wx.gzh.menu.get()
     wx.test.echo ( "-- 自定义菜单/查询接口", res or err)
 
-    local res, err = __.create {
+    local res, err = wx.gzh.menu.create( {
         button  = {
             { name = "今日歌曲", type = "view", url = "http://www.soso.com/" },
             { name = "发送位置", type = "location_select", key = "rselfmenu_2_0" },
@@ -19,10 +22,10 @@ __._TESTING = function()
                 { name = "发送位置", type = "location_select", key = "rselfmenu_2_0" },
             }}
         }
-    }
+    })
     wx.test.echo ( "-- 自定义菜单/创建接口", res or err)
 
-    local res, err = __.delete()
+    local res, err = wx.gzh.menu.delete()
     wx.test.echo ( "-- 自定义菜单/删除接口", res or err)
 
 end

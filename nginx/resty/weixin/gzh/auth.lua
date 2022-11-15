@@ -7,15 +7,18 @@ local __ = { _VERSION = "22.11.04" }
 
 __._TESTING = function()
 
+    package.loaded["resty.weixin"] = nil
+    wx = require "resty.weixin"
+
     wx.init()
 
-    local res, err = __.access_token { code = "1235467890" }
+    local res, err = wx.gzh.auth.access_token { code = "1235467890" }
     wx.test.echo ( "-- 通过 code 换取网页授权access_token", res or err)
 
-    local res, err = __.refresh_token { refresh_token = "1234567890" }
+    local res, err = wx.gzh.auth.refresh_token { refresh_token = "1234567890" }
     wx.test.echo ("-- 刷新access_token", res or err)
 
-    local res, err = __.get_user_info { access_token = "1234567890", openid = "" }
+    local res, err = wx.gzh.auth.get_user_info { access_token = "1234567890", openid = "1234567890" }
     wx.test.echo ("-- 拉取用户信息", res or err)
 
 end
