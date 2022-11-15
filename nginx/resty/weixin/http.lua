@@ -39,9 +39,6 @@ __.send__ = {
     "http请求",
     req = {
         { "url"     , "请求路径"                    },
-
-        { "appid?"  , "第三方用户唯一凭证"          },
-        { "secret?" , "第三方用户唯一凭证密钥"      },
         { "token?"  , "是否需要token"   , "boolean" },
 
         { "args?"   , "请求args"        , "object"  },
@@ -56,8 +53,8 @@ __.send = function(t)
 
     local weixin = ngx.ctx.weixin or {}
 
-    t.appid  = utils.str.strip(t.appid ) or weixin.appid
-    t.secret = utils.str.strip(t.secret) or weixin.secret
+    t.appid  = weixin.appid
+    t.secret = weixin.secret
 
     if not t.appid then return nil, "appid不能为空" end
 

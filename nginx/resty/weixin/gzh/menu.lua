@@ -5,30 +5,25 @@ local __ = { _VERSION = "22.11.01" }
 
 __._TESTING = function()
 
-    wx.test.run {
-        name    = " ------------ 自定义菜单/查询接口 ------------ ",
-        fun     = __.get,
-    }
+    wx.init()
 
-    wx.test.run {
-        name    = " ------------ 自定义菜单/创建接口 ------------ ",
-        fun     = __.create,
-        param   = {
-            button  = {
+    local res, err = __.get()
+    wx.test.echo ( "-- 自定义菜单/查询接口", res or err)
+
+    local res, err = __.create {
+        button  = {
+            { name = "今日歌曲", type = "view", url = "http://www.soso.com/" },
+            { name = "发送位置", type = "location_select", key = "rselfmenu_2_0" },
+            { name = "多级菜单", sub_button = {
                 { name = "今日歌曲", type = "view", url = "http://www.soso.com/" },
                 { name = "发送位置", type = "location_select", key = "rselfmenu_2_0" },
-                { name = "多级菜单", sub_button = {
-                    { name = "今日歌曲", type = "view", url = "http://www.soso.com/" },
-                    { name = "发送位置", type = "location_select", key = "rselfmenu_2_0" },
-                }}
-            }
+            }}
         }
     }
+    wx.test.echo ( "-- 自定义菜单/创建接口", res or err)
 
-    wx.test.run {
-        name    = " ------------ 自定义菜单/删除接口 ------------ ",
-        fun     = __.delete,
-    }
+    local res, err = __.delete()
+    wx.test.echo ( "-- 自定义菜单/删除接口", res or err)
 
 end
 
@@ -87,21 +82,15 @@ __.types = {
 __.get__ = {
     "自定义菜单/查询接口",
     doc = "https://developers.weixin.qq.com/doc/offiaccount/Custom_Menus/Querying_Custom_Menus.html",
-    req = {
-        { "appid?"  , "第三方用户唯一凭证"      },
-        { "secret?" , "第三方用户唯一凭证密钥"  },
-    },
     res = {
         { "is_menu_open"    , "菜单是否开启"    , "number"          },
         { "selfmenu_info"   , "菜单信息"        , "selfmenu_info[]" },
     }
 }
-__.get = function(t)
+__.get = function()
     return wx.http.send {
         url     = "https://api.weixin.qq.com/cgi-bin/get_current_selfmenu_info",
         token   = true,
-        appid   = t.appid,
-        secret  = t.secret,
     }
 end
 
@@ -109,8 +98,6 @@ __.create__ = {
     "自定义菜单/创建接口",
     doc = "https://developers.weixin.qq.com/doc/offiaccount/Custom_Menus/Creating_Custom-Defined_Menu.html",
     req = {
-        { "appid?"  , "第三方用户唯一凭证"      },
-        { "secret?" , "第三方用户唯一凭证密钥"  },
         { "button"  , "一级菜单数组，个数应为1~3个" , "@buttonx[]"   },
     },
     res = {
@@ -122,8 +109,6 @@ __.create = function(t)
     return wx.http.send {
         url     = "https://api.weixin.qq.com/cgi-bin/menu/create",
         token   = true,
-        appid   = t.appid,
-        secret  = t.secret,
         body    = { button = t.button },
     }
 end
@@ -131,10 +116,6 @@ end
 __.delete__ = {
     "自定义菜单/删除接口",
     doc = "https://developers.weixin.qq.com/doc/offiaccount/Custom_Menus/Deleting_Custom-Defined_Menu.html",
-    req = {
-        { "appid?"  , "第三方用户唯一凭证"      },
-        { "secret?" , "第三方用户唯一凭证密钥"  },
-    },
     res = {
         { "errcode" , "错误编码，0为正确", "number" },
         { "errmsg"  , "错误信息，ok为正确"          }
@@ -144,8 +125,6 @@ __.delete = function(t)
     return wx.http.send {
         url     = "https://api.weixin.qq.com/cgi-bin/menu/delete",
         token   = true,
-        appid   = t.appid,
-        secret  = t.secret,
     }
 end
 
