@@ -142,7 +142,7 @@ __.send = function(t)
 end
 
 __.get_access_token__ = {
-    "获取Access token",
+    "取得微信公众号token",
     doc = "https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Get_access_token.html",
     req = {
         { "appid"   , "第三方用户唯一凭证"              },
