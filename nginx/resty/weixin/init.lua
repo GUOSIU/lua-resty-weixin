@@ -1,8 +1,6 @@
 -- @@api : openresty-vsce
 
-local apix = require "app.comm.apix"
-
-local api = apix.new()
+local api = {}
 
 api.init__ = {
     "初始化账户",
@@ -32,5 +30,7 @@ api.init = function(t)
     return true
 
 end
+
+require "app.comm.apix".new(api)
 
 return api
