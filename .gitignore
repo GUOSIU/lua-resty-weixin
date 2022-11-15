@@ -1,8 +1,8 @@
 .rocks
 lua_modules
 lua_types
-nginx/temp
-nginx/logs
-site/temp
-site/orpm.sh
 *.zip
+
+/site/*
+/nginx/*
+!/nginx/resty/*

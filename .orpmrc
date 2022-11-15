@@ -1,7 +1,7 @@
 {
     "version":  "0.0.1",
     "license":  "MIT",
-    "homepage":  "https://github.com/killsen/openresty-orpm",
+    "homepage":  "https://github.com/guosiu/lua-resty-weixin",
     "app_name":  "demo",
     "openresty_ver":  "1.21.4.1",
     "luarocks_ver":  "3.9.1",
@@ -21,6 +21,7 @@
                  "bungle/lua-resty-random":  "master",
                  "fffonion/lua-resty-acme":  "0.9.0",
                  "fffonion/lua-resty-openssl":  "0.8.15",
-                 "guosiu/lua-resty-date":  "v2.2"
+                 "guosiu/lua-resty-date":  "v2.2",
+                 "killsen/lua-resty-ipdb-jit":  "v0.1.2"
              }
 }
