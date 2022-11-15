@@ -21,6 +21,12 @@ __._TESTING = function()
         }
     }
 
+    wx.test.run {
+        name    = " ------------ 用户管理/获取用户列表 ------------ ",
+        fun     = __.get,
+     -- param   = { next_openid = "oVs8y6bohaCm8I0XmuGuLbhzr_IU" }
+    }
+
 end
 
 __.types = {
@@ -53,7 +59,6 @@ __.info__ = {
     res = "@UserInfo"
 }
 __.info = function(t)
-
     return wx.http.send {
         url     = "https://api.weixin.qq.com/cgi-bin/user/info",
         token   = true,
@@ -85,6 +90,31 @@ __.batchget = function(t)
         appid   = t.appid,
         secret  = t.secret,
         body    = { user_list = t.user_list },
+    }
+end
+
+__.get__ = {
+    "用户管理/获取用户列表",
+    doc = "https://developers.weixin.qq.com/doc/offiaccount/User_Management/Getting_a_User_List.html",
+    req = {
+        { "appid?"          , "第三方用户唯一凭证"      },
+        { "secret?"         , "第三方用户唯一凭证密钥"  },
+        { "next_openid?"    , "第一个拉取的OPENID，不填默认从头开始拉取"  },
+    },
+    res = {
+        { "total"   , "关注该公众账号的总用户数"            , "number"  },
+        { "count"   , "拉取的 OPENID 个数，最大值为10000"   , "number"  },
+        { "data?"   , "列表数据，OPENID的列表"              , "string[]"},
+        { "next_openid" , "拉取列表的最后一个用户的OPENID"              },
+    }
+}
+__.get = function(t)
+    return wx.http.send {
+        url     = "https://api.weixin.qq.com/cgi-bin/user/get",
+        token   = true,
+        appid   = t.appid,
+        secret  = t.secret,
+        args    = { next_openid = t.next_openid }
     }
 end
 
