@@ -10,13 +10,13 @@ __._TESTING = function()
 
     wx.init()
 
-    local res, err = __.create_qrcode {
+    local res, err = wx.gzh.qrcode.create_qrcode {
         expire_seconds = 6000,
         scene_str = "test"
     }
     wx.test.echo ( "-- 创建临时二维码", res or err)
 
-    local res, err = __.create_limit_qrcode {
+    local res, err = wx.gzh.qrcode.create_limit_qrcode {
         expire_seconds = 6000,
         scene_str = "test"
     }
@@ -76,5 +76,6 @@ __.create_limit_qrcode = function(t)
         }
     }
 end
+
 
 return __
