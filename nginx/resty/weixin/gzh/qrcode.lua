@@ -16,10 +16,16 @@ __._TESTING = function()
     }
     wx.test.echo ( "-- 创建临时二维码", res or err)
 
+    local res, err = __.create_limit_qrcode {
+        expire_seconds = 6000,
+        scene_str = "test"
+    }
+    wx.test.echo ( "-- 生成永久二维码", res or err)
+
 end
 
 __.create_qrcode__ = {
-    "创建临时二维码",
+    "生成临时二维码",
     doc = "https://developers.weixin.qq.com/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html",
     req = {
         { "expire_seconds"  , "该二维码有效时间，以秒为单位。 最大不超过2592000（即30天），此字段如果不填，则默认有效期为60秒。", "number" },

@@ -2,12 +2,9 @@
 local _decode       = require "cjson.safe".decode
 local _encode       = require "cjson.safe".encode
 local _args         = ngx.encode_args
-local _gsub         = string.gsub
 
 local utils         = require "app.utils"
 local WX_ERROR_CODE = require "resty.weixin.error_code" -- 微信错误编码
-
-local USE_PROXY     = {} -- 使用代理服务器
 
 local __ = { _VERSION = "22.11.01" }
 
@@ -51,29 +48,20 @@ __.send__ = {
 }
 __.send = function(t)
 
-    local weixin = ngx.ctx.weixin or {}
-
-    t.appid  = weixin.appid
-    t.secret = weixin.secret
-
-    if not t.appid then return nil, "appid不能为空" end
-
     -- 获取 access_token
     if t.token then
-        if not t.secret then return nil, "secret不能为空" end
+        local weixin = ngx.ctx.weixin or {}
+
+        t.appid  = weixin.appid
+        t.secret = weixin.secret
+
+        if not t.appid  then return nil, "appid不能为空"    end
+        if not t.secret then return nil, "secret不能为空"   end
+
         local  token, err = __.get_access_token(t)
         if not token then return nil, err end
         t.args = t.args or {}
         t.args.access_token = token
-    end
-
-    local app_url = "[" .. t.appid .. "]" .. t.url
-
-    -- 是否使用代理服务器
-    if USE_PROXY[app_url] then
-        t.url = _gsub(t.url,
-               "https://api.weixin.qq.com/",
-               "http://ngx.weimember.cn/weixin_api/")
     end
 
     local  body, boundary = get_img_body(t)
@@ -113,13 +101,6 @@ __.send = function(t)
     local err  = obj.errmsg  or obj.errMsg
     local code = obj.errcode or obj.errCode
           code = tonumber(code) or 0
-
-    -- IP地址不在白名单中：使用代理模式
-    if code == 40164 and not USE_PROXY[app_url] then
-     -- ngx.log(ngx.ERR, "use proxy: ", app_url)
-        USE_PROXY[app_url] = true
-        return __.send(t)
-    end
 
     if code ~= 0 then
 
