@@ -43,6 +43,9 @@ __.send__ = {
         { "xml?"    , "返回xml字符串"   , "boolean" },
         { "bin?"    , "返回二进制数据"  , "boolean" },
         { "reload?" , "重新获取token"   , "boolean" },
+
+        { "image_type?"     , "上传文件类型"   },
+        { "image_content?"  , "上传文件内容"   },
     },
     res = "object"
 }
