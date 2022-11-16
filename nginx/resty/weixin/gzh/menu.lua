@@ -1,7 +1,7 @@
 
 local wx = require "resty.weixin"
 
-local __ = { _VERSION = "22.11.01" }
+local __ = { _VERSION = "22.11.16" }
 
 __._TESTING = function()
 
