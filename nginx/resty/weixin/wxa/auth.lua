@@ -1,5 +1,4 @@
 
-
 local wx    = require "resty.weixin"
 local utils = require "app.utils"
 

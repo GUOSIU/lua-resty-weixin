@@ -1,5 +1,4 @@
 
-
 local wx = require "resty.weixin"
 
 local __ = { _VERSION = "22.11.16" }
