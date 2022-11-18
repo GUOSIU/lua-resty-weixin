@@ -12,8 +12,8 @@ local __ = { types = _T }
 
 __.set__ = {
     req = {
-        { "appid"  , "小程序ID"     },
-        { "secret" , "小程序秘钥"   },
+        { "appid"  , "公众号或小程序ID"     },
+        { "secret" , "公众号或小程序秘钥"   },
     }
 }
 __.set = function(t)
@@ -34,12 +34,12 @@ local function get_ctx_val(key)
     return ctx and ctx[key] or nil
 end
 
--- 小程序ID
+-- 公众号或小程序ID
 __.get_appid = function()
     return get_ctx_val("appid")
 end
 
--- 小程序秘钥
+-- 公众号或小程序秘钥
 __.get_secret = function()
     return get_ctx_val("secret")
 end
