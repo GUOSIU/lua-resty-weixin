@@ -1,27 +1,12 @@
 
-local wx    = require "resty.weixin"
-local utils = require "app.utils"
+local wxapp = require "resty.weixin.app"
 
 local __ = { _VERSION = "22.11.16" }
 
-__._TESTING = function()
-
-    package.loaded["resty.weixin"] = nil
-    wx = require "resty.weixin"
-
-    wx.init()
-
-    local res, err = wx.wxa.auth.jscode2session { js_code = "1235467890" }
-    wx.test.echo ( "-- 小程序登录", res or err)
-
-end
-
-__.code2Session__ = {
+__.code2session__ = {
     "小程序登录",
     doc = "https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-login/code2Session.html",
     req = {
-        { "appid?"      , "小程序 appId"          },
-        { "secret?"     , "小程序 appSecret"      },
         { "js_code"     , "登录时获取的 code，可通过wx.login获取"    },
     },
     res = {
@@ -32,19 +17,19 @@ __.code2Session__ = {
         errcode     = "number //错误码",
     }
 }
-__.code2Session = function(t)
+__.code2session = function(t)
 
-    local weixin = ngx.ctx.weixin or {}
+    local  appid  = wxapp.ctx.get_appid()
+    local  secret = wxapp.ctx.get_secret()
+    if not appid  then return nil, "第三方用户唯一凭证不能为空" end
+    if not secret then return nil, "第三方用户唯一凭证密钥不能为空" end
 
-    t.appid  = utils.str.strip(t.appid ) or weixin.appid
-    t.secret = utils.str.strip(t.secret) or weixin.secret
-
-    return wx.http.send {
+    return wxapp.ctx.request {
         url     = "https://api.weixin.qq.com/sns/jscode2session",
         token   = false,   -- 不需要 access_token
         args    = {
-            appid       = t.appid,
-            secret      = t.secret,
+            appid       = appid,
+            secret      = secret,
             js_code     = t.js_code,
             grant_type  = "authorization_code", -- 默认，填写为authorization_code
         }

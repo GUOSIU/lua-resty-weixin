@@ -1,19 +1,7 @@
 
-local wx = require "resty.weixin"
+local wxapp = require "resty.weixin.app"
 
 local __ = { _VERSION = "22.11.16" }
-
-__._TESTING = function()
-
-    package.loaded["resty.weixin"] = nil
-    wx = require "resty.weixin"
-
-    wx.init()
-
-    local res, err = wx.wxa.user.get_phone_number { code = "your code" }
-    wx.test.echo ( "-- 获取手机号", res or err)
-
-end
 
 __.get_phone_number__ = {
     "获取手机号",
@@ -35,7 +23,7 @@ __.get_phone_number__ = {
     }
 }
 __.get_phone_number = function(t)
-    return wx.http.send {
+    return wxapp.ctx.request {
         url     = "https://api.weixin.qq.com/wxa/business/getuserphonenumber",
         token   = true,
         body    = { code = t.code },

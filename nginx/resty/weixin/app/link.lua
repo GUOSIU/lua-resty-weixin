@@ -1,22 +1,7 @@
 
-local wx = require "resty.weixin"
+local wxapp = require "resty.weixin.app"
 
 local __ = { _VERSION = "22.11.16" }
-
-__._TESTING = function()
-
-    package.loaded["resty.weixin"] = nil
-    wx = require "resty.weixin"
-
-    wx.init()
-
-    local res, err = wx.wxa.link.generate_scheme()
-    wx.test.echo ( "-- 获取scheme码", res or err)
-
-    local res, err = wx.wxa.link.generate_url_link()
-    wx.test.echo ( "-- 获取 URL Link", res or err)
-
-end
 
 __.types = {
     JumpInfo = {
@@ -43,7 +28,7 @@ __.generate_scheme__ = {
     }
 }
 __.generate_scheme = function(t)
-    return wx.http.send {
+    return wxapp.ctx.request {
         url     = "https://api.weixin.qq.com/wxa/generatescheme",
         token   = true,
         body    = {
@@ -70,11 +55,13 @@ __.generate_url_link__ = {
 
     },
     res = {
-
+        openlink    = "string // 生成的小程序 URL Link",
+        errcode     = "number // 错误码",
+        errmsg      = "string // 错误信息",
     }
 }
 __.generate_url_link = function(t)
-    return wx.http.send {
+    return wxapp.ctx.request {
         url     = "https://api.weixin.qq.com/wxa/generate_urllink",
         token   = true,
         body    = {

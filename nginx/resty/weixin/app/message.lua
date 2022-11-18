@@ -1,31 +1,8 @@
 
-local wx    = require "resty.weixin"
+local wxapp = require "resty.weixin.app"
 
-local __ = { _VERSION = "22.11.16" }
-
-__._TESTING = function()
-
-    package.loaded["resty.weixin"] = nil
-    wx = require "resty.weixin"
-
-    wx.init()
-
-    local res, err = wx.wxa.kf_message.get_temp_media { media_id = "1235467890" }
-    wx.test.echo ( "-- 获取客服消息内的临时素材", res or err)
-
-    local res, err = wx.wxa.kf_message.upload_temp_media {
-        image_content = "1234567890"
-    }
-    wx.test.echo ( "-- 新增图片素材", res or err)
-
-    local res, err = wx.wxa.kf_message.send_custom_message {
-        touser  = "oVs8y6bohaCm8I0XmuGuLbhzr_IU",
-        msgtype = "text",
-        text    = { content = "hello openresty!" }
-    }
-    wx.test.echo ( "-- 发送客服消息", res or err)
-
-end
+local _T = {}
+local __ = { _VERSION = "22.11.16", types = _T }
 
 __.get_temp_media__ = {
     "获取客服消息内的临时素材",
@@ -41,7 +18,7 @@ __.get_temp_media__ = {
     }
 }
 __.get_temp_media = function(t)
-    return wx.http.send {
+    return wxapp.ctx.request {
         url     = "https://api.weixin.qq.com/cgi-bin/media/get",
         token   = true,
         args    = { media_id = t.media_id }
@@ -66,7 +43,7 @@ __.upload_temp_media__ = {
     }
 }
 __.upload_temp_media = function(t)
-    return wx.http.send {
+    return wxapp.ctx.request {
         url             = "https://api.weixin.qq.com/cgi-bin/media/upload",
         token           = true,
         args            = { type = t.type or "image" },
@@ -75,6 +52,19 @@ __.upload_temp_media = function(t)
     }
 end
 
+_T.TextInfo  = { content = "string // 文本消息内容" }
+_T.ImageInfo = { media_id = "string // 发送的图片的媒体ID：通过 uploadTempMedia上传图片文件获得。" }
+_T.LinkInfo  = {
+    title       = "string // 消息标题",
+    description = "string // 图文链接消息",
+    url         = "string // 图文链接消息被点击后跳转的链接",
+    thumb_url   = "string // 图文链接消息的图片链接，支持 JPG、PNG 格式，较好的效果为大图 640 X 320，小图 80 X 80",
+}
+_T.MiniProgrampageInfo = {
+    title       = "string // 消息标题",
+    pagepath    = "string // 小程序的页面路径，跟 app.json 对齐，支持参数，比如pages/index/index?foo=bar",
+    thumb_media_id = "string // 小程序消息卡片的封面， image 类型的 media_id，通过 uploadTempMedia接口上传图片文件获得，建议大小为 520*416",
+}
 __.send_custom_message__ = {
     "发送客服消息",
     doc = "https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/kf-mgnt/kf-message/sendCustomMessage.html",
@@ -85,25 +75,6 @@ __.send_custom_message__ = {
         image   = '@ImageInfo? // 图片消息：msgtype="image" 时必填',
         link    = '@LinkInfo? // 图文链接：msgtype="link" 时必填',
         miniprogrampage = '@MiniProgrampageInfo? // 小程序卡片：msgtype="miniprogrampage" 时必填',
-    },
-    types = {
-        TextInfo = {
-            content = "string // 文本消息内容"
-        },
-        ImageInfo = {
-            media_id = "string // 发送的图片的媒体ID：通过 uploadTempMedia上传图片文件获得。"
-        },
-        LinkInfo = {
-            title       = "string // 消息标题",
-            description = "string // 图文链接消息",
-            url         = "string // 图文链接消息被点击后跳转的链接",
-            thumb_url   = "string // 图文链接消息的图片链接，支持 JPG、PNG 格式，较好的效果为大图 640 X 320，小图 80 X 80",
-        },
-        MiniProgrampageInfo = {
-            title       = "string // 消息标题",
-            pagepath    = "string // 小程序的页面路径，跟 app.json 对齐，支持参数，比如pages/index/index?foo=bar",
-            thumb_media_id = "string // 小程序消息卡片的封面， image 类型的 media_id，通过 uploadTempMedia接口上传图片文件获得，建议大小为 520*416",
-        }
     },
     res = {
         errcode     = "number // 错误码",
@@ -129,7 +100,7 @@ __.send_custom_message = function(t)
         return nil, "msgtype类型错误"
     end
 
-    return wx.http.send {
+    return wxapp.ctx.request {
         url     = "https://api.weixin.qq.com/cgi-bin/message/custom/business/send",
         token   = true,
         body    = {

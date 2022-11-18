@@ -1,32 +1,14 @@
 
-local wx = require "resty.weixin"
+local wxapp = require "resty.weixin.app"
 
-local __ = { _VERSION = "22.11.16" }
+local _T = {}
+local __ = { _VERSION = "22.11.16", types = _T }
 
-__._TESTING = function()
-
-    package.loaded["resty.weixin"] = nil
-    wx = require "resty.weixin"
-
-    wx.init()
-
-    local res, err = wx.wxa.qrcode.get_qrcode {
-        path = "/pages/home",
-    }
-    wx.test.echo ( "-- 获取小程序码", res or err)
-
-    local res, err = wx.wxa.qrcode.get_unlimited_qrcode {
-        scene = "1234567890",
-    }
-    wx.test.echo ( "-- 获取不限制的小程序码", res or err)
-
-    local res, err = wx.wxa.qrcode.create_qrcode {
-        path = "/pages/home",
-    }
-    wx.test.echo ( "-- 获取小程序二维码", res or err)
-
-end
-
+_T.LintColor = {
+    r = 'string // 默认值{"r":0,"g":0,"b":0} ；auto_color 为 false 时生效，使用 rgb 设置颜色',
+    g = 'string // 默认值{"r":0,"g":0,"b":0} ；auto_color 为 false 时生效，使用 rgb 设置颜色',
+    b = 'string // 默认值{"r":0,"g":0,"b":0} ；auto_color 为 false 时生效，使用 rgb 设置颜色',
+}
 __.get_qrcode__ = {
     "获取小程序码",
     doc = "https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/qrcode-link/qr-code/getQRCode.html",
@@ -37,13 +19,6 @@ __.get_qrcode__ = {
         line_color  = '@LintColor? //自定义线条颜色：默认值{"r":0,"g":0,"b":0} ；auto_color 为 false 时生效，使用 rgb 设置颜色',
         is_hyaline  = "boolean? //是否透明底色：默认值false；是否需要透明底色，为 true 时，生成透明底色的小程序码",
     },
-    types = {
-        LintColor = {
-            r = 'string // 默认值{"r":0,"g":0,"b":0} ；auto_color 为 false 时生效，使用 rgb 设置颜色',
-            g = 'string // 默认值{"r":0,"g":0,"b":0} ；auto_color 为 false 时生效，使用 rgb 设置颜色',
-            b = 'string // 默认值{"r":0,"g":0,"b":0} ；auto_color 为 false 时生效，使用 rgb 设置颜色',
-        },
-    },
     res = {
         buffer      = "string // 图片 Buffer",
         errcode     = "number // 错误码",
@@ -51,7 +26,7 @@ __.get_qrcode__ = {
     }
 }
 __.get_qrcode = function(t)
-    return wx.http.send {
+    return wxapp.ctx.request {
         url     = "https://api.weixin.qq.com/wxa/getwxacode",
         token   = true,
         body    = {
@@ -84,7 +59,7 @@ __.get_unlimited_qrcode__ = {
     }
 }
 __.get_unlimited_qrcode = function(t)
-    return wx.http.send {
+    return wxapp.ctx.request {
         url     = "https://api.weixin.qq.com/wxa/getwxacodeunlimit",
         token   = true,
         body    = {
@@ -115,7 +90,7 @@ __.create_qrcode__ = {
     }
 }
 __.create_qrcode = function(t)
-    return wx.http.send {
+    return wxapp.ctx.request {
         url     = "https://api.weixin.qq.com/cgi-bin/wxaapp/createwxaqrcode",
         token   = true,
         body    = {
