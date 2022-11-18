@@ -1,28 +1,7 @@
 
-local wx = require "resty.weixin"
+local wxgzh = require "resty.weixin.gzh"
 
 local __ = { _VERSION = "22.11.16" }
-
-__._TESTING = function()
-
-    package.loaded["resty.weixin"] = nil
-    wx = require "resty.weixin"
-
-    wx.init()
-
-    local res, err = wx.gzh.qrcode.create_qrcode {
-        expire_seconds = 6000,
-        scene_str = "test"
-    }
-    wx.test.echo ( "-- 创建临时二维码", res or err)
-
-    local res, err = wx.gzh.qrcode.create_limit_qrcode {
-        expire_seconds = 6000,
-        scene_str = "test"
-    }
-    wx.test.echo ( "-- 生成永久二维码", res or err)
-
-end
 
 __.create_qrcode__ = {
     "生成临时二维码",
@@ -43,7 +22,7 @@ __.create_qrcode = function(t)
     if t.expire_seconds > 2592000 then t.expire_seconds = 2592000 end -- 最大30天
     if t.expire_seconds < 60      then t.expire_seconds = 60      end -- 最小60秒
 
-    return wx.http.send {
+    return wxgzh.ctx.request {
         url     = "https://api.weixin.qq.com/cgi-bin/qrcode/create",
         token   = true,
         body    = {
@@ -67,7 +46,7 @@ __.create_limit_qrcode__ = {
     }
 }
 __.create_limit_qrcode = function(t)
-    return wx.http.send {
+    return wxgzh.ctx.request {
         url     = "https://api.weixin.qq.com/cgi-bin/qrcode/create",
         token   = true,
         body    = {

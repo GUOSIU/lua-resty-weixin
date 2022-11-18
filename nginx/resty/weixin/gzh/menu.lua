@@ -1,34 +1,7 @@
 
-local wx = require "resty.weixin"
+local wxgzh = require "resty.weixin.gzh"
 
 local __ = { _VERSION = "22.11.16" }
-
-__._TESTING = function()
-
-    package.loaded["resty.weixin"] = nil
-    wx = require "resty.weixin"
-
-    wx.init()
-
-    local res, err = wx.gzh.menu.get()
-    wx.test.echo ( "-- 自定义菜单/查询接口", res or err)
-
-    local res, err = wx.gzh.menu.create( {
-        button  = {
-            { name = "今日歌曲", type = "view", url = "http://www.soso.com/" },
-            { name = "发送位置", type = "location_select", key = "rselfmenu_2_0" },
-            { name = "多级菜单", sub_button = {
-                { name = "今日歌曲", type = "view", url = "http://www.soso.com/" },
-                { name = "发送位置", type = "location_select", key = "rselfmenu_2_0" },
-            }}
-        }
-    })
-    wx.test.echo ( "-- 自定义菜单/创建接口", res or err)
-
-    local res, err = wx.gzh.menu.delete()
-    wx.test.echo ( "-- 自定义菜单/删除接口", res or err)
-
-end
 
 __.types = {
     news_info = {
@@ -91,7 +64,7 @@ __.get__ = {
     }
 }
 __.get = function()
-    return wx.http.send {
+    return wxgzh.ctx.request {
         url     = "https://api.weixin.qq.com/cgi-bin/get_current_selfmenu_info",
         token   = true,
     }
@@ -109,7 +82,7 @@ __.create__ = {
     }
 }
 __.create = function(t)
-    return wx.http.send {
+    return wxgzh.ctx.request {
         url     = "https://api.weixin.qq.com/cgi-bin/menu/create",
         token   = true,
         body    = { button = t.button },
@@ -125,7 +98,7 @@ __.delete__ = {
     }
 }
 __.delete = function()
-    return wx.http.send {
+    return wxgzh.ctx.request {
         url     = "https://api.weixin.qq.com/cgi-bin/menu/delete",
         token   = true,
     }

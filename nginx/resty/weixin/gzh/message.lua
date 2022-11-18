@@ -1,26 +1,7 @@
 
-local wx = require "resty.weixin"
+local wxgzh = require "resty.weixin.gzh"
 
 local __ = { _VERSION = "22.11.16" }
-
-__._TESTING = function()
-
-    package.loaded["resty.weixin"] = nil
-    wx = require "resty.weixin"
-
-    wx.init()
-
-    local res, err = wx.gzh.message.template_send {
-        touser      = "oVs8y6bohaCm8I0XmuGuLbhzr_IU",
-        template_id = "123",
-        url         = "https://www.baidu.com",
-        first       = "您好！",
-        remark      = "欢迎下次光临！",
-        keywords    = {ngx.localtime(), "abc", "123"}
-    }
-    wx.test.echo ( "-- 发送模板消息", res or err)
-
-end
 
 __.types = {
     MiniInfo = {
@@ -60,7 +41,7 @@ __.template_send = function(t)
         data["keyword" .. i] = { value=v, color="#173177" }
     end
 
-    return wx.http.send {
+    return wxgzh.ctx.request {
         url     = "https://api.weixin.qq.com/cgi-bin/message/template/send"
     ,   token   = true
     ,   body    = {

@@ -1,47 +1,15 @@
 
-local wx    = require "resty.weixin"
-local utils = require "app.utils"
+local wxgzh = require "resty.weixin.gzh"
 
-local __ = { _VERSION = "22.11.16" }
-
-__._TESTING = function()
-
-    package.loaded["resty.weixin"] = nil
-    wx = require "resty.weixin"
-
-    wx.init()
-
-    local res, err = wx.gzh.auth.access_token { code = "1235467890" }
-    wx.test.echo ( "-- 通过 code 换取网页授权access_token", res or err)
-
-    local res, err = wx.gzh.auth.refresh_token { refresh_token = "1234567890" }
-    wx.test.echo ("-- 刷新access_token", res or err)
-
-    local res, err = wx.gzh.auth.get_user_info { access_token = "1234567890", openid = "1234567890" }
-    wx.test.echo ("-- 拉取用户信息", res or err)
-
-end
-
-__.types = {
-    UserInfo = {
-        openid	        = "string   //用户标识：对当前公众号唯一",
-        nickname	    = "string   //用户昵称",
-        sex	            = "number   //用户性别：值为1时是男性，值为2时是女性，值为0时是未知",
-        province	    = "string   //用户个人资料填写的省份",
-        city	        = "string   //普通用户个人资料填写的城市",
-        country	        = "string   //国家，如中国为CN",
-        headimgurl	    = "string   //用户头像，最后一个数值代表正方形头像大小（有0、46、64、96、132数值可选，0代表640*640正方形头像），用户没有头像时该项为空。若用户更换头像，原有头像 URL 将失效。",
-        privilege       = "string[] //用户特权信息，json 数组，如微信沃卡用户为（chinaunicom）",
-        unionid	        = "string   //只有在用户将公众号绑定到微信开放平台帐号后，才会出现该字段。",
-    }
-}
+local _T = {}
+local __ = { _VERSION = "22.11.16", types = _T }
 
 __.access_token__ = {
     "通过 code 换取网页授权access_token",
     doc = "https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html",
     req = {
-        { "appid?"      , "第三方用户唯一凭证"          },
-        { "secret?"     , "第三方用户唯一凭证密钥"      },
+     -- { "appid"       , "第三方用户唯一凭证"          },
+     -- { "secret"      , "第三方用户唯一凭证密钥"      },
         { "code"        , "用户同意授权后，获取code"    },
     },
     res = {
@@ -55,17 +23,17 @@ __.access_token__ = {
 }
 __.access_token = function(t)
 
-    local weixin = ngx.ctx.weixin or {}
+    local  appid  = wxgzh.ctx.get_appid()
+    local  secret = wxgzh.ctx.get_secret()
+    if not appid  then return nil, "第三方用户唯一凭证不能为空" end
+    if not secret then return nil, "第三方用户唯一凭证密钥不能为空" end
 
-    t.appid  = utils.str.strip(t.appid ) or weixin.appid
-    t.secret = utils.str.strip(t.secret) or weixin.secret
-
-    return wx.http.send {
+    return wxgzh.ctx.request {
         url     = "https://api.weixin.qq.com/sns/oauth2/access_token",
         token   = false,   -- 不需要 access_token
         args    = {
-            appid       = t.appid,
-            secret      = t.secret,
+            appid       = appid,
+            secret      = secret,
             code        = t.code,
             grant_type  = "authorization_code", -- 默认，填写为authorization_code
         }
@@ -76,7 +44,7 @@ __.refresh_token__ = {
     "刷新access_token",
     doc = "https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html",
     req = {
-        { "appid?"          , "第三方用户唯一凭证"                              },
+     -- { "appid"           , "第三方用户唯一凭证"                              },
         { "refresh_token"   , "填写通过access_token获取到的refresh_token参数"   },
     },
     res = {
@@ -89,11 +57,10 @@ __.refresh_token__ = {
 }
 __.refresh_token = function(t)
 
-    local weixin = ngx.ctx.weixin or {}
+    local  appid  = wxgzh.ctx.get_appid()
+    if not appid  then return nil, "第三方用户唯一凭证不能为空" end
 
-    t.appid  = utils.str.strip(t.appid ) or weixin.appid
-
-    return wx.http.send {
+    return wxgzh.ctx.request {
         url     = "https://api.weixin.qq.com/sns/oauth2/refresh_token",
         token   = false,   -- 不需要 access_token
         args    = {
@@ -104,6 +71,17 @@ __.refresh_token = function(t)
     }
 end
 
+_T.UserInfo = {
+    openid	        = "string   //用户标识：对当前公众号唯一",
+    nickname	    = "string   //用户昵称",
+    sex	            = "number   //用户性别：值为1时是男性，值为2时是女性，值为0时是未知",
+    province	    = "string   //用户个人资料填写的省份",
+    city	        = "string   //普通用户个人资料填写的城市",
+    country	        = "string   //国家，如中国为CN",
+    headimgurl	    = "string   //用户头像，最后一个数值代表正方形头像大小（有0、46、64、96、132数值可选，0代表640*640正方形头像），用户没有头像时该项为空。若用户更换头像，原有头像 URL 将失效。",
+    privilege       = "string[] //用户特权信息，json 数组，如微信沃卡用户为（chinaunicom）",
+    unionid	        = "string   //只有在用户将公众号绑定到微信开放平台帐号后，才会出现该字段。",
+}
 __.get_user_info__ = {
     "拉取用户信息(需 scope 为 snsapi_userinfo)",
     doc = "https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html",
@@ -115,7 +93,7 @@ __.get_user_info__ = {
     res = "@UserInfo"
 }
 __.get_user_info = function(t)
-    return wx.http.send {
+    return wxgzh.ctx.request {
         url     = "https://api.weixin.qq.com/sns/userinfo",
         token   = false,   -- 不需要 access_token
         args    = {

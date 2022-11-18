@@ -1,31 +1,13 @@
 
-local wx = require "resty.weixin"
+local wxgzh = require "resty.weixin.gzh"
 
 local __ = { _VERSION = "22.11.16" }
 
-__._TESTING = function()
-
-    package.loaded["resty.weixin"] = nil
-    wx = require "resty.weixin"
-
-    wx.init()
-
-    local res, err = wx.gzh.user.info { openid = "oVs8y6bohaCm8I0XmuGuLbhzr_IU" }
-    wx.test.echo ( "-- 获取用户基本信息", res or err)
-
-    local res, err = wx.gzh.user.batchget {
-        user_list = {
-            { openid = "oVs8y6bohaCm8I0XmuGuLbhzr_IU" }
-        }
-    }
-    wx.test.echo ( "-- 批量获取用户基本信息", res or err)
-
-    local res, err = wx.gzh.user.get()
-    wx.test.echo ( "-- 用户管理/获取用户列表", res or err)
-
-end
-
 __.types = {
+    User = {
+        openid          = "string   //用户的标识",
+        lang            = "string   //国家地区语言版本",
+    },
     UserInfo = {
         subscribe       = "number   //用户是否订阅该公众号标识，值为0时，代表此用户没有关注该公众号，拉取不到其余信息。",
         openid          = "string   //用户的标识，对当前公众号唯一",
@@ -44,14 +26,11 @@ __.types = {
 __.info__ = {
     "获取用户基本信息(UnionID机制)",
     doc = "https://developers.weixin.qq.com/doc/offiaccount/User_Management/Get_users_basic_information_UnionID.html#UinonId",
-    req = {
-        { "openid"  , "用户的标识"          },
-        { "lang?"   , "国家地区语言版本"    },
-    },
+    req = "@User",
     res = "@UserInfo"
 }
 __.info = function(t)
-    return wx.http.send {
+    return wxgzh.ctx.request {
         url     = "https://api.weixin.qq.com/cgi-bin/user/info",
         token   = true,
         args    = { openid = t.openid, lang = "zh_CN" }
@@ -72,7 +51,7 @@ __.batchget = function(t)
         return nil, "openid列表不能为空"
     end
 
-    return wx.http.send {
+    return wxgzh.ctx.request {
         url     = "https://api.weixin.qq.com/cgi-bin/user/info/batchget",
         token   = true,
         body    = { user_list = t.user_list },
@@ -95,7 +74,7 @@ __.get__ = {
     }
 }
 __.get = function(t)
-    return wx.http.send {
+    return wxgzh.ctx.request {
         url     = "https://api.weixin.qq.com/cgi-bin/user/get",
         token   = true,
         args    = { next_openid = t.next_openid }
