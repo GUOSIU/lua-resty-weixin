@@ -6,6 +6,10 @@ local _md5      = ngx.md5
 local _sha1     = ngx.sha1_bin
 local _upper    = string.upper
 
+local utils         = require "app.utils"
+local _request      = utils.request
+local _args         = ngx.encode_args
+
 local _T = {}
 local __ = { types = _T }
 
@@ -93,6 +97,55 @@ __.gen_sign = function(t, use_sha1, is_upper)
 
     return sign
 
+end
+
+__.request__ = {
+    "http请求",
+    req = {
+        { "url"         , "请求路径"                },
+        { "args?"       , "请求args"    , "object"  },
+        { "body?"       , "请求body"    , "object"  },
+    },
+    res = "object"
+}
+__.request = function(t)
+
+    local body = t.body
+
+    -- 转成xml格式， 微信 2.0 接口使用xml
+    if type(body) == "table" then
+
+        -- 随机字符串
+        if not body.nonce_str then body.nonce_str = __.gen_nonce(32) end
+
+        -- 签名
+        if not body.sign then body.sign = __.gen_sign(body) end
+
+        body = utils.xml.to_xml(body)
+    end
+
+    local res, err = _request (t.url, {
+            ssl_verify  = false -- 不校验证书
+        ,   method      = body and "POST" or "GET"
+        ,   body        = body
+        ,   query       = t.args and _args(t.args)
+        ,   headers     = {
+            ["Content-Type"] = "application/x-www-form-urlencoded; charset=utf-8"
+        }
+    })
+    if err then return nil, err end
+
+    if res.status ~= ngx.HTTP_OK then
+        return nil, '连接微信服务器失败：' .. res.status
+    end
+
+    local  obj = utils.xml.from_xml(res.body)
+    if not obj then return nil, "XML解码失败" end
+
+    if obj.return_code ~= "SUCCESS" then return nil, obj.return_msg   end
+    if obj.result_code ~= "SUCCESS" then return nil, obj.err_code_des end
+
+    return obj -- 返回对象
 end
 
 return __
