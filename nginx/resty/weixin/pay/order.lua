@@ -32,6 +32,7 @@ __.create__ = {
      -- nonce_str   = "string // 随机字符串：String(32)长度要求在32位以内。",
      -- sign        = "string // 签名: String(64)通过签名算法计算得出的签名值",
         sign_type   = "string?// 签名类型: String(32)签名类型，默认为MD5，支持HMAC-SHA256和MD5。",
+        openid      = "string? // 用户标识: String(128)trade_type=JSAPI，此参数必传，用户在商户appid下的唯一标识",
         body        = "string // 商品描述: String(127)商品简单描述",
         detail      = "string? // 商品详情: String(6000)商品详细描述，对于使用单品优惠的商户，该字段必须按照规范上传",
         attach      = "any? // 附加数据: String(127)附加数据，在查询API和支付通知中原样返回，可作为自定义参数使用",
@@ -46,7 +47,6 @@ __.create__ = {
         trade_type  = "string // 交易类型: String(16) 小程序 - JSAPI, JSAPI支付 - JSAPI, Native支付 - NATIVE, APP支付 - APP",
         product_id  = "string? // 商品ID: String(32)trade_type=NATIVE时，此参数必传。此参数为二维码中包含的商品ID，商户自行定义",
         limit_pay   = "string? // 指定支付方式: String(32)上传此参数no_credit--可限制用户不能使用信用卡支付",
-        openid      = "string? // 用户标识: String(128)trade_type=JSAPI，此参数必传，用户在商户appid下的唯一标识",
         receipt     = "string? // 电子发票入口开放标识: String(8)Y，传入Y时，支付成功消息和支付详情页将出现开票入口。需要在微信支付商户平台或微信公众平台开通电子发票功能，传此字段才可生效",
         profit_sharing = "string? // 是否需要分账: String(16)Y-是，需要分账,N-否，不分账, 字母要求大写，不传默认不分账",
         scene_info = "string? // 场景信息: String(256)该字段常用于线下活动时的场景信息上报，支持上报实际门店信息，商户也可以按需求自己上报相关信息。该字段为JSON对象数据",
@@ -347,39 +347,39 @@ __.refund_query__ = {
     res = {
         "@SysCode", "@BiCode",
         -- 以下字段在return_code 和result_code都为SUCCESS的时候有返回
-        total_refund_count = "number? // 订单总退款次数: 订单总共已发生的部分退款次数，当请求参数传入offset后有返回",
-        transaction_id = "string // 微信订单号",
-        out_trade_no = "string // 商户订单号",
-        total_fee = "number // 订单金额",
+        total_refund_count  = "number? // 订单总退款次数: 订单总共已发生的部分退款次数，当请求参数传入offset后有返回",
+        transaction_id      = "string // 微信订单号",
+        out_trade_no        = "string // 商户订单号",
+        total_fee           = "number // 订单金额",
         settlement_total_fee = "number? // 应结订单金额: 当订单使用了免充值型优惠券后返回该参数，应结订单金额=订单金额-免充值优惠券金额。",
-        fee_type = "string? // 货币种类: 订单金额货币类型，符合ISO 4217标准的三位字母代码，默认人民币：CNY",
-        cash_fee = "number // 现金支付金额: 现金支付金额，单位为分，只能为整数",
-        refund_count = "number // 退款笔数: 当前返回退款笔数",
-        out_refund_no_0 = "string // 商户退款单号: 商户系统内部的退款单号",
-        refund_id_0 = "string // 微信退款单号",
-        refund_channel_0 = [[string? // 退款渠道:
+        fee_type            = "string? // 货币种类: 订单金额货币类型，符合ISO 4217标准的三位字母代码，默认人民币：CNY",
+        cash_fee            = "number // 现金支付金额: 现金支付金额，单位为分，只能为整数",
+        refund_count        = "number // 退款笔数: 当前返回退款笔数",
+        out_refund_no_0     = "string // 商户退款单号: 商户系统内部的退款单号",
+        refund_id_0         = "string // 微信退款单号",
+        refund_channel_0    = [[string? // 退款渠道:
             ORIGINAL        — 原路退款,
             BALANCE         — 退回到余额,
             OTHER_BALANCE   — 原账户异常退到其他余额账户,
             OTHER_BANKCARD  — 原银行卡异常退到其他银行卡,
         ]],
-        refund_fee_0 = "number // 申请退款金额: 退款总金额,单位为分,可以做部分退款",
-        refund_fee = "number // 退款总金额: 各退款单的退款金额累加",
-        coupon_refund_fee = "number // 代金券退款总金额: 各退款单的代金券退款金额累加",
+        refund_fee_0        = "number // 申请退款金额: 退款总金额,单位为分,可以做部分退款",
+        refund_fee          = "number // 退款总金额: 各退款单的退款金额累加",
+        coupon_refund_fee   = "number // 代金券退款总金额: 各退款单的代金券退款金额累加",
         settlement_refund_fee_0 = "number? // 退款金额: 退款金额=申请退款金额-非充值代金券退款金额，退款金额<=申请退款金额",
-        coupon_type_0_0 = "string? // 代金券类型: CASH--充值代金券，NO_CASH---非充值优惠券。开通免充值券功能，并且订单使用了优惠券后有返回（取值：CASH、NO_CASH）。$n为下标,$m为下标,从0开始编号",
+        coupon_type_0_0     = "string? // 代金券类型: CASH--充值代金券，NO_CASH---非充值优惠券。开通免充值券功能，并且订单使用了优惠券后有返回（取值：CASH、NO_CASH）。$n为下标,$m为下标,从0开始编号",
         coupon_refund_fee_0 = "number? // 总代金券退款金额: 代金券退款金额<=退款金额，退款金额-代金券或立减优惠退款金额为现金",
-        coupon_refund_count_0 = "number? // 退款代金券使用数量: 退款代金券使用数量 ,$n为下标,从0开始编号",
-        coupon_refund_id_0_0 = "string? // 退款代金券ID: 退款代金券ID, $n为下标，$m为下标，从0开始编号",
-        coupon_refund_fee_0_0 = "number? // 单个代金券退款金额: 单个退款代金券支付金额, $n为下标，$m为下标，从0开始编号",
-        refund_status_0 = [[string // 退款状态:
+        coupon_refund_count_0   = "number? // 退款代金券使用数量: 退款代金券使用数量 ,$n为下标,从0开始编号",
+        coupon_refund_id_0_0    = "string? // 退款代金券ID: 退款代金券ID, $n为下标，$m为下标，从0开始编号",
+        coupon_refund_fee_0_0   = "number? // 单个代金券退款金额: 单个退款代金券支付金额, $n为下标，$m为下标，从0开始编号",
+        refund_status_0     = [[string // 退款状态:
             SUCCESS     — 退款成功
             REFUNDCLOSE — 退款关闭，指商户发起退款失败的情况。
             PROCESSING  — 退款处理中
             CHANGE      — 退款异常，退款到银行发现用户的卡作废或者冻结了，导致原路退款银行卡失败。
             $n为下标，从0开始编号。
         ]],
-        refund_account_0 = [[string? // 退款资金来源:
+        refund_account_0     = [[string? // 退款资金来源:
             REFUND_SOURCE_RECHARGE_FUNDS    --- 可用余额退款/基本账户，
             REFUND_SOURCE_UNSETTLED_FUNDS   --- 未结算资金退款，
             $n为下标，从0开始编号]],
@@ -424,6 +424,137 @@ __.refund_query = function(t)
 
     local obj, err = wxpay.ctx.request {
         url     = "https://api.mch.weixin.qq.com/pay/refundquery",
+        body    = body
+    }
+    if not obj then return nil, err end
+
+    return obj
+end
+
+__.micropay__ = {
+    "付款码支付",
+    doc = "https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_10&index=1",
+    req = {
+     -- appid       = "  // 公众账号ID或小程序ID: String(32)小程序ID或公众号ID",
+     -- mch_id      = "  // 商户号: String(32)微信支付分配的商户号",
+        device_info = "? // 端设备号：String(32)自定义参数，可以为终端设备号(门店号或收银设备ID)，PC网页或公众号内支付可以传'WEB'",
+     -- nonce_str   = "  // 随机字符串：String(32)长度要求在32位以内。",
+     -- sign        = "  // 签名: String(64)通过签名算法计算得出的签名值",
+        sign_type   = "? // 签名类型: String(32)签名类型，默认为MD5，支持HMAC-SHA256和MD5。",
+        body        = "  // 商品描述: String(127)商品简单描述",
+        detail      = "? // 商品详情: String(6000)商品详细描述，对于使用单品优惠的商户，该字段必须按照规范上传",
+        attach      = "any? // 附加数据: String(127)附加数据，在查询API和支付通知中原样返回，可作为自定义参数使用",
+        out_trade_no = " // 商户订单号: String(32)商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*且在同一个商户号下唯一",
+        total_fee   = "number // 订单金额: int订单总金额，单位为元 (特殊地，内部转换单位为分)",
+        fee_type    = "? // 标价币种: String(16)符合ISO 4217标准的三位字母代码，默认人民币：CNY",
+     -- spbill_create_ip = " // 终端IP: String(64)支持IPV4和IPV6两种格式的IP地址。调用微信支付API的机器IP",
+        goods_tag   = "? // 订单优惠标记: String(32)订单优惠标记，使用代金券或立减优惠功能时需要的参数",
+        limit_pay   = "? // 指定支付方式: String(32)上传此参数no_credit--可限制用户不能使用信用卡支付",
+        time_start  = "? // 交易起始时间: String(14)订单生成时间，格式为yyyyMMddHHmmss",
+        time_expire = "? // 交易结束时间: String(14)订单失效时间，格式为yyyyMMddHHmmss",
+        receipt     = "? // 电子发票入口开放标识: String(8)Y，传入Y时，支付成功消息和支付详情页将出现开票入口。需要在微信支付商户平台或微信公众平台开通电子发票功能，传此字段才可生效",
+        auth_code   = [[ // 付款码: String(128)扫码支付付款码，设备读取用户微信中的条码或者二维码信息
+        （用户付款码规则：18位纯数字，前缀以10、11、12、13、14、15开头）]],
+        scene_info  = "? // 场景信息: String(256)该字段常用于线下活动时的场景信息上报，支持上报实际门店信息，商户也可以按需求自己上报相关信息。该字段为JSON对象数据",
+        profit_sharing = "? // 是否需要分账: String(16)Y-是，需要分账,N-否，不分账, 字母要求大写，不传默认不分账",
+    },
+    res = {
+        "@SysCode", "@BiCode",
+        -- 以下字段在return_code 和result_code都为SUCCESS的时候有返回
+        openid              = "// 用户标识: 用户在商户appid 下的唯一标识",
+        is_subscribe        = "// 是否关注公众账号: 用户是否关注公众账号，仅在公众账号类型支付有效，取值范围：Y或N;Y-关注;N-未关注",
+        trade_type          = "// 交易类型: MICROPAY 付款码支付",
+        bank_type           = "// 付款银行: 银行类型，采用字符串类型的银行标识",
+        fee_type            = "?// 货币类型: 符合ISO 4217标准的三位字母代码，默认人民币：CNY",
+        total_fee           = "number // 订单金额: 订单总金额，单位为分，只能为整数",
+        settlement_total_fee = "number? // 应结订单金额: 当订单使用了免充值型优惠券后返回该参数，应结订单金额=订单金额-免充值优惠券金额。",
+        coupon_fee          = "number? // 代金券金额: “代金券”金额<=订单金额，订单金额-“代金券”金额=现金支付金额",
+        cash_fee_type       = "?//现金支付货币类型: 符合ISO 4217标准的三位字母代码，默认人民币：CNY",
+        cash_fee            = "number// 现金支付金额: 订单现金支付金额",
+        transaction_id      = "//微信支付订单号: 微信支付订单号",
+        out_trade_no        = "//商户订单号: 商户系统内部订单号，要求32个字符内（最少6个字符），只能是数字、大小写字母_-|*且在同一个商户号下唯一",
+        attach              = "?//商家数据包: 商家数据包，原样返回",
+        time_end            = "//支付完成时间: 订单生成时间，格式为yyyyMMddHHmmss",
+        promotion_detail    = "?//营销详情: 新增返回，单品优惠功能字段",
+    }
+}
+__.micropay = function(t)
+
+    local  appid = wxpay.ctx.get_appid()
+    local  mchid = wxpay.ctx.get_mchid()
+    if not appid then return nil, "公众账号ID或小程序ID不能为空" end
+    if not mchid then return nil, "商户号不能为空" end
+
+    t.total_fee = tonumber(t.total_fee)
+    if not t.total_fee or t.total_fee<=0 then return nil, "支付金额必须大于0" end
+
+    if type(t.attach) == "table" then t.attach = _encode(t.attach) end
+
+    local body = {
+        appid           = appid,
+        mch_id          = mchid,
+        device_info     = t.device_info,
+        sign_type       = t.sign_type or "MD5",
+        body            = t.body,
+        detail          = t.detail,
+        attach          = t.attach,
+        out_trade_no    = t.out_trade_no,
+        total_fee       = t.total_fee * 100, -- 金额（单位：分）,
+        fee_type        = t.fee_type or "CNY", -- 默认人民币,
+        spbill_create_ip= t.spbill_create_ip or ngx.var.remote_addr,
+        goods_tag       = t.goods_tag,
+        limit_pay       = t.limit_pay,
+        time_start      = t.time_start,
+        time_expire     = t.time_expire,
+        receipt         = t.receipt,
+        auth_code       = t.auth_code,
+        scene_info      = t.scene_info,
+        profit_sharing  = t.profit_sharing,
+    }
+
+    return wxpay.ctx.request {
+        url     = "https://api.mch.weixin.qq.com/pay/micropay",
+        body    = body
+    }
+end
+
+__.reverse__ = {
+    "撤销订单(付款码支付)",
+    doc = "https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_11&index=3",
+    req = {
+     -- appid           = "string // 公众账号ID或小程序ID: String(32)小程序ID或公众号ID",
+     -- mch_id          = "string // 商户号: String(32)微信支付分配的商户号",
+        transaction_id  = "string?// 微信订单号: String(32)微信的订单号，优先使用",
+        out_trade_no    = "string // 商户订单号: String(32)商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*且在同一个商户号下唯一",
+     -- nonce_str       = "string // 随机字符串：String(32)长度要求在32位以内。",
+     -- sign            = "string // 签名: String(64)通过签名算法计算得出的签名值",
+        sign_type       = "string?// 签名类型: String(32)签名类型，默认为MD5，支持HMAC-SHA256和MD5。",
+    },
+    res = { "@SysCode", "@BiCode",
+        recall = "string //是否重调: 是否需要继续调用撤销，Y-需要，N-不需要"
+    }
+}
+__.reverse = function(t)
+
+    local  appid = wxpay.ctx.get_appid()
+    local  mchid = wxpay.ctx.get_mchid()
+    if not appid then return nil, "公众账号ID或小程序ID不能为空" end
+    if not mchid then return nil, "商户号不能为空" end
+
+    -- 重要！！请求需要双向证书
+--  local url = "https://api.mch.weixin.qq.com/secapi/pay/reverse"
+    local url = "http://127.0.0.1/proxy/" .. mchid .. "/secapi/pay/reverse" --【使用反向代理（带证书）】
+
+    local body = {
+        appid               = appid,
+        mch_id              = mchid,
+        transaction_id      = t.transaction_id,
+        out_trade_no        = t.out_trade_no,
+        sign_type           = t.sign_type or "MD5",
+    }
+
+    local obj, err = wxpay.ctx.request {
+        url     = url,
         body    = body
     }
     if not obj then return nil, err end

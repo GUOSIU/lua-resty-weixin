@@ -39,6 +39,16 @@ local res, err = wxpay.order.create {
 echo(cjson_pretty(res or err))
 echo ""
 
+-- echo "-- 付款码支付接口"
+-- local res, err = wxpay.order.micropay {
+--     body            = "测试商品",
+--     out_trade_no    = out_trade_no,
+--     total_fee       = total_fee,
+--     auth_code       = "132625722829176173",
+-- }
+-- echo(cjson_pretty(res or err))
+-- echo ""
+
 echo "-- 查询订单接口"
 local res, err = wxpay.order.query {
     out_trade_no = out_trade_no
@@ -70,3 +80,10 @@ local res, err = wxpay.order.refund_query {
 }
 echo(cjson_pretty(res or err))
 echo ""
+
+-- echo "-- 撤销订单(付款码支付)接口"
+-- local res, err = wxpay.order.reverse {
+--     out_trade_no = out_trade_no
+-- }
+-- echo(cjson_pretty(res or err))
+-- echo ""
