@@ -46,6 +46,18 @@ local res, err = wxpay.order.create {
 echo(cjson_pretty(res or err))
 echo ""
 
+-- echo "-- 获取微信支付数据包"
+-- local res, err = wxpay.order.get_package {
+--     body            = "测试商品",
+--     out_trade_no    = out_trade_no,
+--     total_fee       = total_fee,
+--     notify_url      = "Your Notify_url",
+--     trade_type      = "JSAPI",
+--     openid          = "",
+-- }
+-- echo(cjson_pretty(res or err))
+-- echo ""
+
 -- echo "-- 付款码支付接口"
 -- local res, err = wxpay.order.micropay {
 --     body            = "测试商品",

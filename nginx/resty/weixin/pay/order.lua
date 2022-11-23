@@ -132,6 +132,44 @@ __.create = function(t)
 
 end
 
+__.get_package__ = {
+    "获取微信支付数据包",
+ -- doc = "https://pay.weixin.qq.com/wiki/doc/api/jsapi_sl.php?chapter=7_7&index=6",
+    doc = "https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_sl_api.php?chapter=7_7&index=5",
+    req = __.create__.req,
+    res = {
+        appId       = "//小程序或公众号id: appId为当前服务商号绑定的appid",
+        timeStamp   = "//时间戳: 当前的时间",
+        nonceStr    = "//随机字符串: 随机字符串，不长于32位",
+        package     = "//订单详情扩展字符串: 统一下单接口返回的prepay_id参数值，提交格式如：prepay_id=***",
+        signType    = "//签名方式: 签名类型，默认为MD5，支持HMAC-SHA256和MD5。注意此处需与统一下单的签名类型一致",
+        paySign     = "//签名"
+    },
+}
+__.get_package = function(t)
+
+    local  wx_account, err = wxpay.ctx.get_pay_account()
+    if not wx_account then return nil, err end
+
+    local  res, err = __.create(t)
+    if not res then return nil, err end
+
+    local prepay_id = res.prepay_id
+    if type(prepay_id) ~= "string" or prepay_id == "" then return nil, "生成预付单号空失败" end
+
+    local p = {
+        appId       = wx_account.pkg_app_id,
+        timeStamp   = "" .. ngx.now() * 1000,    -- 强制字符串类型，否则ios系统出错
+        nonceStr    = wxpay.ctx.gen_nonce(),
+        package     = "prepay_id=" .. prepay_id, -- 预付单号
+        signType    = "MD5",
+    }
+
+    p.paySign = wxpay.ctx.gen_sign(p, wx_account.pay_mch_key)
+
+    return p
+end
+
 __.query__ = {
     "查询订单",
  -- doc = "https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_2",

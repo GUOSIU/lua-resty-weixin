@@ -60,31 +60,35 @@ __.get_pay_account = function()
         parent_mode = parent_mode,  -- 1 服务商模式 0 普通商户
         pay_app_id  = "",
         pay_mch_id  = "",
+        pay_mch_key = "",
         sub_app_id  = "",
         sub_mch_id  = "",
         pkg_app_id  = "",
     }
 
     if parent_mode == 1 then            -- 服务商模式
-        t.pay_app_id = __.get_parent_appid()
-        t.pay_mch_id = __.get_parent_mchid()
-        t.sub_app_id = __.get_appid()   -- 可为空：若为空，则不返回 sub_openid
-        t.sub_mch_id = __.get_mchid()
-        t.pkg_app_id = is_wxapp and t.sub_app_id or t.pay_app_id
+        t.pay_app_id    = __.get_parent_appid()
+        t.pay_mch_id    = __.get_parent_mchid()
+        t.pay_mch_key   = __.get_parent_mchkey()
+        t.sub_app_id    = __.get_appid()   -- 可为空：若为空，则不返回 sub_openid
+        t.sub_mch_id    = __.get_mchid()
+        t.pkg_app_id    = is_wxapp and t.sub_app_id or t.pay_app_id
 
         if not t.sub_mch_id or t.sub_mch_id == "" then return nil, "子商户号不能为空" end
 
     else
-        t.pay_app_id = __.get_appid()   -- 普通商户
-        t.pay_mch_id = __.get_mchid()
-        t.sub_app_id = nil
-        t.sub_mch_id = nil
-        t.pkg_app_id = t.pay_app_id
+        t.pay_app_id    = __.get_appid()   -- 普通商户
+        t.pay_mch_id    = __.get_mchid()
+        t.pay_mch_key   = __.get_mchkey()
+        t.sub_app_id    = nil
+        t.sub_mch_id    = nil
+        t.pkg_app_id    = t.pay_app_id
 
     end
 
-    if not t.pay_app_id or t.pay_app_id == "" then return nil, "公众账号ID或小程序ID不能为空" end
-    if not t.pay_mch_id or t.pay_mch_id == "" then return nil, "商户号不能为空"               end
+    if not t.pay_app_id  or t.pay_app_id  == "" then return nil, "公众账号ID或小程序ID不能为空" end
+    if not t.pay_mch_id  or t.pay_mch_id  == "" then return nil, "商户号不能为空"               end
+    if not t.pay_mch_key or t.pay_mch_key == "" then return nil, "商户秘钥不能报为空"           end
 
     return t
 end
