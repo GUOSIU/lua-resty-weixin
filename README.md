@@ -50,10 +50,10 @@ wxpay.ctx.set {
     appid           = "",       -- 公众账号ID或小程序ID
     mchid           = "",       -- 商户编码
     mchkey          = "",       -- 商户秘钥
+    is_wxapp        = false,    -- 是否小程序
 
     -- 服务商模式需要填写以下内容
     parent_mode     = 0,        -- 1 服务商 0 普通商户
-    is_wxapp        = false,    -- 是否小程序
     parent_appid    = "",       -- 服务商公众账号ID
     parent_mchid    = "",       -- 服务商商户编码
     parent_mchkey   = "",       -- 服务商商户秘钥
