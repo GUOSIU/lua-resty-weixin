@@ -46,7 +46,7 @@ echo ""
 
 echo "-- 发送客服消息"
     local  res, err = wxapp.message.send_custom_message {
-        touser  = "oVs8y6bohaCm8I0XmuGuLbhzr_IU",
+        touser  = "",
         msgtype = "text",
         text    = { content = "hello openresty!" }
     }

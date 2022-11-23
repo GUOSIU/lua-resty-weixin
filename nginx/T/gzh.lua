@@ -60,7 +60,7 @@ echo ""
 echo "-- 3. message消息接口 -------------------------------------------------"
 echo "-- 发送模板消息"
     local  res, err = wxgzh.message.template_send {
-        touser      = "oVs8y6bohaCm8I0XmuGuLbhzr_IU",
+        touser      = "",
         template_id = "123",
         url         = "https://www.baidu.com",
         first       = "您好！",
@@ -88,14 +88,14 @@ echo ""
 
 echo "-- 5. user用户接口 -------------------------------------------------"
 echo "-- 获取用户基本信息"
-    local  res, err = wxgzh.user.info { openid = "oVs8y6bohaCm8I0XmuGuLbhzr_IU" }
+    local  res, err = wxgzh.user.info { openid = "" }
 echo ( cjson_pretty(res or err) )
 echo ""
 
 echo "-- 批量获取用户基本信息"
     local  res, err = wxgzh.user.batchget {
         user_list = {
-            { openid = "oVs8y6bohaCm8I0XmuGuLbhzr_IU" }
+            { openid = "" }
         }
     }
 echo ( cjson_pretty(res or err) )
