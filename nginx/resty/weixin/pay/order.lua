@@ -15,6 +15,8 @@ _T.SysCode = {
 _T.BiCode = {
     appid           = "//公众账号ID：调用接口提交的公众账号ID",
     mch_id	        = "//商户号：调用接口提交的商户号",
+    sub_appid       = "?//子商户公众账号ID: 微信分配的子商户公众账号ID",
+    sub_mch_id      = "?//子商户号: 微信支付分配的子商户号",
     nonce_str 	    = "//随机字符串：微信返回的随机字符串",
     sign   	        = "//签名：微信返回的签名值，详见签名算法",
     result_code     = "//业务结果：SUCCESS/FAIL",
@@ -24,15 +26,19 @@ _T.BiCode = {
 
 __.create__ = {
     "统一下单",
-    doc = "https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_1",
+ -- doc = "https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_1",
+    doc = "https://pay.weixin.qq.com/wiki/doc/api/jsapi_sl.php?chapter=9_1",
     req = {
      -- appid       = "string // 公众账号ID或小程序ID: String(32)小程序ID或公众号ID",
      -- mch_id      = "string // 商户号: String(32)微信支付分配的商户号",
+     -- sub_appid   = "string // 子商户公众账号ID: 微信分配的子商户公众账号ID，如需在支付完成后获取sub_openid则此参数必传",
+     -- sub_mch_id  = "string // 子商户号: String(32)微信支付分配的子商户号",
         device_info = "string? // 端设备号：String(32)自定义参数，可以为终端设备号(门店号或收银设备ID)，PC网页或公众号内支付可以传'WEB'",
      -- nonce_str   = "string // 随机字符串：String(32)长度要求在32位以内。",
      -- sign        = "string // 签名: String(64)通过签名算法计算得出的签名值",
         sign_type   = "string?// 签名类型: String(32)签名类型，默认为MD5，支持HMAC-SHA256和MD5。",
         openid      = "string? // 用户标识: String(128)trade_type=JSAPI，此参数必传，用户在商户appid下的唯一标识",
+     -- sub_openid  = "string? // 用户子标识: String(128)trade_type=JSAPI，此参数必传，用户在商户appid下的唯一标识",
         body        = "string // 商品描述: String(127)商品简单描述",
         detail      = "string? // 商品详情: String(6000)商品详细描述，对于使用单品优惠的商户，该字段必须按照规范上传",
         attach      = "any? // 附加数据: String(127)附加数据，在查询API和支付通知中原样返回，可作为自定义参数使用",
@@ -66,10 +72,8 @@ __.create__ = {
 }
 __.create = function(t)
 
-    local  appid = wxpay.ctx.get_appid()
-    local  mchid = wxpay.ctx.get_mchid()
-    if not appid then return nil, "公众账号ID或小程序ID不能为空" end
-    if not mchid then return nil, "商户号不能为空" end
+    local  wx_account, err = wxpay.ctx.get_pay_account()
+    if not wx_account then return nil, err end
 
     t.total_fee = tonumber(t.total_fee)
     if not t.total_fee or t.total_fee<=0 then return nil, "支付金额必须大于0" end
@@ -85,10 +89,14 @@ __.create = function(t)
     if type(t.attach) == "table" then t.attach = _encode(t.attach) end
 
     local body = {
-        appid               = appid,
-        mch_id              = mchid,
+        appid               = wx_account.pay_app_id,
+        mch_id              = wx_account.pay_mch_id,
+        sub_appid           = wx_account.sub_app_id,
+        sub_mch_id          = wx_account.sub_mch_id,
 
-        openid              = t.openid,
+        openid              = not wx_account.sub_app_id and t.openid or nil,
+        sub_openid          =     wx_account.sub_app_id and t.openid or nil,
+
         out_trade_no        = t.out_trade_no,
         total_fee           = t.total_fee * 100, -- 金额（单位：分）
         fee_type            = t.fee_type or "CNY", -- 默认人民币
@@ -126,7 +134,8 @@ end
 
 __.query__ = {
     "查询订单",
-    doc = "https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_2",
+ -- doc = "https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_2",
+    doc = "https://pay.weixin.qq.com/wiki/doc/api/jsapi_sl.php?chapter=9_2",
     req = {
      -- appid       = "string // 公众账号ID或小程序ID: String(32)小程序ID或公众号ID",
      -- mch_id      = "string // 商户号: String(32)微信支付分配的商户号",
@@ -139,10 +148,11 @@ __.query__ = {
     res = {
         "@SysCode", "@BiCode",
         -- 以下字段在return_code 和result_code都为SUCCESS的时候有返回
-        device_info = "string? // 设备号: 微信支付分配的终端设备号",
-        openid      = "string  // 用户标识: 用户在商户appid下的唯一标识",
-        is_subscribe    = "string // 是否关注公众账号: 用户是否关注公众账号，Y-关注，N-未关注",
-        trade_type      = "string // 交易类型: 调用接口提交的交易类型，取值如下：JSAPI，NATIVE，APP，MICROPAY",
+        device_info     = "string? // 设备号: 微信支付分配的终端设备号",
+        openid          = "string  // 用户标识: 用户在商户appid下的唯一标识",
+        is_subscribe    = "string  // 是否关注公众账号: 用户是否关注公众账号，Y-关注，N-未关注",
+        sub_openid      = "string? // 用户子标识: 用户在子商户appid下的唯一标识",
+        trade_type      = "string  // 交易类型: 调用接口提交的交易类型，取值如下：JSAPI，NATIVE，APP，MICROPAY",
         trade_state     = [[string // 交易状态
             SUCCESS     -- 支付成功,
             REFUND      -- 转入退款,
@@ -173,10 +183,8 @@ __.query__ = {
 }
 __.query = function(t)
 
-    local  appid = wxpay.ctx.get_appid()
-    local  mchid = wxpay.ctx.get_mchid()
-    if not appid then return nil, "公众账号ID或小程序ID不能为空" end
-    if not mchid then return nil, "商户号不能为空" end
+    local  wx_account, err = wxpay.ctx.get_pay_account()
+    if not wx_account then return nil, err end
 
     t.transaction_id = utils.str.strip(t.transaction_id)
     t.out_trade_no   = utils.str.strip(t.out_trade_no)
@@ -186,8 +194,10 @@ __.query = function(t)
     end
 
     local body = {
-        appid               = appid,
-        mch_id              = mchid,
+        appid               = wx_account.pay_app_id,
+        mch_id              = wx_account.pay_mch_id,
+        sub_appid           = wx_account.sub_app_id,
+        sub_mch_id          = wx_account.sub_mch_id,
         transaction_id      = t.transaction_id,
         out_trade_no        = t.out_trade_no,
         sign_type           = t.sign_type or "MD5",
@@ -199,12 +209,20 @@ __.query = function(t)
     }
     if not obj then return nil, err end
 
+    -- 若是服务商模式，openid对应的是服务商的appid
+    -- 而我们更希望是得到 sub_appid 对应的openid
+    if wx_account.sub_app_id then
+        obj.openidx = obj.openid
+        obj.openid  = obj.sub_openid
+    end
+
     return obj
 end
 
 __.close__ = {
     "关闭订单",
-    doc = "https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_3",
+ -- doc = "https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_3",
+    doc = "https://pay.weixin.qq.com/wiki/doc/api/jsapi_sl.php?chapter=9_3",
     req = {
      -- appid           = "string // 公众账号ID或小程序ID: String(32)小程序ID或公众号ID",
      -- mch_id          = "string // 商户号: String(32)微信支付分配的商户号",
@@ -217,14 +235,14 @@ __.close__ = {
 }
 __.close = function(t)
 
-    local  appid = wxpay.ctx.get_appid()
-    local  mchid = wxpay.ctx.get_mchid()
-    if not appid then return nil, "公众账号ID或小程序ID不能为空" end
-    if not mchid then return nil, "商户号不能为空" end
+    local  wx_account, err = wxpay.ctx.get_pay_account()
+    if not wx_account then return nil, err end
 
     local body = {
-        appid               = appid,
-        mch_id              = mchid,
+        appid               = wx_account.pay_app_id,
+        mch_id              = wx_account.pay_mch_id,
+        sub_appid           = wx_account.sub_app_id,
+        sub_mch_id          = wx_account.sub_mch_id,
         out_trade_no        = t.out_trade_no,
         sign_type           = t.sign_type or "MD5",
     }
@@ -240,7 +258,8 @@ end
 
 __.refund__ = {
     "申请退款",
-    doc = "https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_4",
+ -- doc = "https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_4",
+    doc = "https://pay.weixin.qq.com/wiki/doc/api/jsapi_sl.php?chapter=9_4" ,
     req = {
      -- appid           = "string // 公众账号ID或小程序ID: String(32)小程序ID或公众号ID",
      -- mch_id          = "string // 商户号: String(32)微信支付分配的商户号",
@@ -283,10 +302,8 @@ __.refund__ = {
 }
 __.refund = function(t)
 
-    local  appid = wxpay.ctx.get_appid()
-    local  mchid = wxpay.ctx.get_mchid()
-    if not appid then return nil, "公众账号ID或小程序ID不能为空" end
-    if not mchid then return nil, "商户号不能为空" end
+    local  wx_account, err = wxpay.ctx.get_pay_account()
+    if not wx_account then return nil, err end
 
     t.transaction_id = utils.str.strip(t.transaction_id)    -- 若两个参数都传，优先级最高
     t.out_trade_no   = utils.str.strip(t.out_trade_no)
@@ -303,11 +320,14 @@ __.refund = function(t)
 
     -- 重要！！请求需要双向证书
 --  local url = "https://api.mch.weixin.qq.com/secapi/pay/refund"
-    local url = "http://127.0.0.1/proxy/" .. mchid .. "/secapi/pay/refund" --【使用反向代理（带证书）】
+    local url = "http://127.0.0.1/proxy/" --【使用反向代理（带证书）】
+             .. wx_account.pay_mch_id .. "/secapi/pay/refund"
 
     local body = {
-        appid               = appid,
-        mch_id              = mchid,
+        appid               = wx_account.pay_app_id,
+        mch_id              = wx_account.pay_mch_id,
+        sub_appid           = wx_account.sub_app_id,
+        sub_mch_id          = wx_account.sub_mch_id,
         sign_type           = t.sign_type or "MD5",
         transaction_id      = t.transaction_id,
         out_trade_no        = t.out_trade_no,
@@ -331,7 +351,8 @@ end
 
 __.refund_query__ = {
     "查询退款",
-    doc = "https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_5",
+ -- doc = "https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_5",
+    doc = "https://pay.weixin.qq.com/wiki/doc/api/jsapi_sl.php?chapter=9_5",
     req = {
      -- appid       = "string // 公众账号ID或小程序ID: String(32)小程序ID或公众号ID",
      -- mch_id      = "string // 商户号: String(32)微信支付分配的商户号",
@@ -396,10 +417,8 @@ __.refund_query__ = {
 }
 __.refund_query = function(t)
 
-    local  appid = wxpay.ctx.get_appid()
-    local  mchid = wxpay.ctx.get_mchid()
-    if not appid then return nil, "公众账号ID或小程序ID不能为空" end
-    if not mchid then return nil, "商户号不能为空" end
+    local  wx_account, err = wxpay.ctx.get_pay_account()
+    if not wx_account then return nil, err end
 
     t.transaction_id = utils.str.strip(t.transaction_id)
     t.out_trade_no   = utils.str.strip(t.out_trade_no)
@@ -413,8 +432,10 @@ __.refund_query = function(t)
     end
 
     local body = {
-        appid               = appid,
-        mch_id              = mchid,
+        appid               = wx_account.pay_app_id,
+        mch_id              = wx_account.pay_mch_id,
+        sub_appid           = wx_account.sub_app_id,
+        sub_mch_id          = wx_account.sub_mch_id,
         sign_type           = t.sign_type or "MD5",
         transaction_id      = t.transaction_id,
         out_trade_no        = t.out_trade_no,
@@ -433,7 +454,8 @@ end
 
 __.micropay__ = {
     "付款码支付",
-    doc = "https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_10&index=1",
+ -- doc = "https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_10&index=1",
+    doc = "https://pay.weixin.qq.com/wiki/doc/api/micropay_sl.php?chapter=9_10&index=1",
     req = {
      -- appid       = "  // 公众账号ID或小程序ID: String(32)小程序ID或公众号ID",
      -- mch_id      = "  // 商户号: String(32)微信支付分配的商户号",
@@ -480,10 +502,8 @@ __.micropay__ = {
 }
 __.micropay = function(t)
 
-    local  appid = wxpay.ctx.get_appid()
-    local  mchid = wxpay.ctx.get_mchid()
-    if not appid then return nil, "公众账号ID或小程序ID不能为空" end
-    if not mchid then return nil, "商户号不能为空" end
+    local  wx_account, err = wxpay.ctx.get_pay_account()
+    if not wx_account then return nil, err end
 
     t.total_fee = tonumber(t.total_fee)
     if not t.total_fee or t.total_fee<=0 then return nil, "支付金额必须大于0" end
@@ -491,8 +511,10 @@ __.micropay = function(t)
     if type(t.attach) == "table" then t.attach = _encode(t.attach) end
 
     local body = {
-        appid           = appid,
-        mch_id          = mchid,
+        appid           = wx_account.pay_app_id,
+        mch_id          = wx_account.pay_mch_id,
+        sub_appid       = wx_account.sub_app_id,
+        sub_mch_id      = wx_account.sub_mch_id,
         device_info     = t.device_info,
         sign_type       = t.sign_type or "MD5",
         body            = t.body,
@@ -520,7 +542,8 @@ end
 
 __.reverse__ = {
     "撤销订单(付款码支付)",
-    doc = "https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_11&index=3",
+ -- doc = "https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_11&index=3",
+    doc = "https://pay.weixin.qq.com/wiki/doc/api/micropay_sl.php?chapter=9_11&index=3",
     req = {
      -- appid           = "string // 公众账号ID或小程序ID: String(32)小程序ID或公众号ID",
      -- mch_id          = "string // 商户号: String(32)微信支付分配的商户号",
@@ -536,21 +559,22 @@ __.reverse__ = {
 }
 __.reverse = function(t)
 
-    local  appid = wxpay.ctx.get_appid()
-    local  mchid = wxpay.ctx.get_mchid()
-    if not appid then return nil, "公众账号ID或小程序ID不能为空" end
-    if not mchid then return nil, "商户号不能为空" end
+    local  wx_account, err = wxpay.ctx.get_pay_account()
+    if not wx_account then return nil, err end
 
     -- 重要！！请求需要双向证书
 --  local url = "https://api.mch.weixin.qq.com/secapi/pay/reverse"
-    local url = "http://127.0.0.1/proxy/" .. mchid .. "/secapi/pay/reverse" --【使用反向代理（带证书）】
+    local url = "http://127.0.0.1/proxy/" --【使用反向代理（带证书）】
+              .. wx_account.pay_mch_id .. "/secapi/pay/reverse"
 
     local body = {
-        appid               = appid,
-        mch_id              = mchid,
-        transaction_id      = t.transaction_id,
-        out_trade_no        = t.out_trade_no,
-        sign_type           = t.sign_type or "MD5",
+        appid           = wx_account.pay_app_id,
+        mch_id          = wx_account.pay_mch_id,
+        sub_appid       = wx_account.sub_app_id,
+        sub_mch_id      = wx_account.sub_mch_id,
+        transaction_id  = t.transaction_id,
+        out_trade_no    = t.out_trade_no,
+        sign_type       = t.sign_type or "MD5",
     }
 
     local obj, err = wxpay.ctx.request {

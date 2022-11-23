@@ -15,9 +15,15 @@ local __ = { types = _T }
 
 __.set__ = {
     req = {
-        { "appid"   , "公众账号ID或小程序ID"    },
-        { "mchid"   , "商户编码"                },
-        { "mchkey"  , "商户秘钥"                },
+        { "appid?"          , "公众账号ID或小程序ID"    },
+        { "mchid"           , "商户编码"                },
+        { "mchkey?"         , "商户秘钥"                },
+        { "parent_mode?"    , "是否服务商模式", "number"},
+        { "is_wxapp?"       , "是否小程序"  , "boolean" },
+
+        { "parent_appid?"   , "服务商公众账号ID"    },
+        { "parent_mchid?"   , "服务商商户编码"      },
+        { "parent_mchkey?"  , "服务商商户秘钥"      },
     }
 }
 __.set = function(t)
@@ -28,15 +34,59 @@ __.set = function(t)
         ngx.ctx[__] = ctx
     end
 
-    ctx.appid   = t.appid
-    ctx.mchid   = t.mchid
-    ctx.mchkey  = t.mchkey
+    ctx.appid       = t.appid
+    ctx.mchid       = t.mchid
+    ctx.mchkey      = t.mchkey
+    ctx.is_wxapp    = t.is_wxapp
+
+    ctx.parent_mode     = t.parent_mode -- 1 服务商模式; 0 普通商户
+    ctx.parent_appid    = t.parent_appid
+    ctx.parent_mchid    = t.parent_mchid
+    ctx.parent_mchkey   = t.parent_mchkey
 
 end
 
 local function get_ctx_val(key)
     local  ctx = ngx.ctx[__]
     return ctx and ctx[key] or nil
+end
+
+__.get_pay_account = function()
+
+    local parent_mode = __.get_parent_mode() or 0
+    local is_wxapp    = __.get_is_wxapp() == true
+
+    local t = {
+        parent_mode = parent_mode,  -- 1 服务商模式 0 普通商户
+        pay_app_id  = "",
+        pay_mch_id  = "",
+        sub_app_id  = "",
+        sub_mch_id  = "",
+        pkg_app_id  = "",
+    }
+
+    if parent_mode == 1 then            -- 服务商模式
+        t.pay_app_id = __.get_parent_appid()
+        t.pay_mch_id = __.get_parent_mchid()
+        t.sub_app_id = __.get_appid()   -- 可为空：若为空，则不返回 sub_openid
+        t.sub_mch_id = __.get_mchid()
+        t.pkg_app_id = is_wxapp and t.sub_app_id or t.pay_app_id
+
+        if not t.sub_mch_id or t.sub_mch_id == "" then return nil, "子商户号不能为空" end
+
+    else
+        t.pay_app_id = __.get_appid()   -- 普通商户
+        t.pay_mch_id = __.get_mchid()
+        t.sub_app_id = nil
+        t.sub_mch_id = nil
+        t.pkg_app_id = t.pay_app_id
+
+    end
+
+    if not t.pay_app_id or t.pay_app_id == "" then return nil, "公众账号ID或小程序ID不能为空" end
+    if not t.pay_mch_id or t.pay_mch_id == "" then return nil, "商户号不能为空"               end
+
+    return t
 end
 
 -- 公众账号ID或小程序ID
@@ -52,6 +102,31 @@ end
 -- 商户秘钥
 __.get_mchkey = function()
     return get_ctx_val("mchkey")
+end
+
+-- 是否小程序
+__.get_is_wxapp = function()
+    return get_ctx_val("is_wxapp")
+end
+
+-- 是否服务商模式
+__.get_parent_mode = function()
+    return get_ctx_val("parent_mode")
+end
+
+-- 服务商公众账号ID
+__.get_parent_appid = function()
+    return get_ctx_val("parent_appid")
+end
+
+-- 服务商商户编码
+__.get_parent_mchid = function()
+    return get_ctx_val("parent_mchid")
+end
+
+-- 服务商商户秘钥
+__.get_parent_mchkey = function()
+    return get_ctx_val("parent_mchkey")
 end
 
 -- 生成随机码
@@ -70,7 +145,11 @@ __.gen_sign = function(t, use_sha1, is_upper)
 -- @is_upper : boolean // 是否大写
 -- @return   : string
 
-    local key = __.get_mchkey()
+    local parent_mode = __.get_parent_mode()
+
+    local key = parent_mode == 1
+            and __.get_parent_mchkey()  -- 服务商模式
+             or __.get_mchkey()         -- 普通商户
 
     -- 清除空字符串
     for k, v in pairs(t) do
