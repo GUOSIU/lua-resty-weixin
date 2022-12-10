@@ -18,9 +18,9 @@ __.set__ = {
         { "appid?"          , "公众账号ID或小程序ID"    },
         { "mchid"           , "商户编码"                },
         { "mchkey?"         , "商户秘钥"                },
-        { "parent_mode?"    , "是否服务商模式", "number"},
         { "is_wxapp?"       , "是否小程序"  , "boolean" },
 
+        { "parent_mode?"    , "是否服务商模式", "number"},
         { "parent_appid?"   , "服务商公众账号ID"    },
         { "parent_mchid?"   , "服务商商户编码"      },
         { "parent_mchkey?"  , "服务商商户秘钥"      },
